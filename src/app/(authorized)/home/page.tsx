@@ -1,9 +1,15 @@
+"use client";
+
 import { auth } from "@/lib/auth";
 import { Pool } from "@neondatabase/serverless";
 import { CloudinaryImage } from "@/components/cloudinary-image";
-import { CldVideoPlayer } from "next-cloudinary";
+import ClientVideoPlayer from "@/components/home/ClientVideoPlayer";
 
 export const runtime = "edge";
+
+interface ImageData {
+  public_url: string;
+}
 
 export default async function HomePage() {
   const session = await auth();
@@ -19,7 +25,7 @@ export default async function HomePage() {
     "SELECT public_url FROM images WHERE owner = $1",
     [userId]
   );
-  const images = imagesResult.rows;
+  const images: ImageData[] = imagesResult.rows;
   console.log(images)
   await pool.end();
 
@@ -33,12 +39,15 @@ export default async function HomePage() {
           <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
             {images.map((image, index) => (
               <div key={index} className="mb-4 break-inside-avoid">
-                <CloudinaryImage
-                  src={image.public_url}
-                  
-                  alt={`Image ${index + 1}`}
-                  className="w-full h-auto rounded-lg"
-                />
+                {image.public_url.includes(`${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video`) ? (
+                  <ClientVideoPlayer publicId={image.public_url.split('/upload/')[1]} />
+                ) : (
+                  <CloudinaryImage
+                    src={image.public_url}
+                    alt={`Image ${index + 1}`}
+                    className="w-full h-auto rounded-lg"
+                  />
+                )}
               </div>
             ))}
           </div>
