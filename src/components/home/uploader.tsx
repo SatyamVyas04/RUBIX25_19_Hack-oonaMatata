@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 import { Button } from "../ui/button";
+import { Session } from "next-auth";
 
-const CloudinaryImageUploader = ({ session }) => {
+const CloudinaryImageUploader = ({ session }: { session: Session | null }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   // Handle Image Upload Success

@@ -1,3 +1,4 @@
+
 import { auth } from "@/lib/auth";
 import { sql } from "@neondatabase/serverless";
 import { Album } from "@/lib/types";
@@ -46,3 +47,4 @@ export default async function AlbumsPage() {
     </div>
   );
 }
+
