@@ -8,7 +8,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#111111] text-[#b4b4b4]">
-      <nav className="fixed top-0 w-full bg-[#111111]/80 backdrop-blur-sm border-b border-[#3A3A3A] z-50">
+      {/* <nav className="fixed top-0 w-full bg-[#111111]/80 backdrop-blur-sm border-b border-[#3A3A3A] z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-[#eeeeee]">TheMemoryBox</h1>
           <div className="flex items-center gap-4">
@@ -16,7 +16,7 @@ export default async function HomePage() {
             <SignOut />
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       <div className="pt-32 px-6">
         <div className="max-w-7xl mx-auto">
