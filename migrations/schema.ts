@@ -50,6 +50,13 @@ export const capsules = pgTable("capsules", {
 	password: text("password"),
 });
 
+export const images = pgTable("images", {
+	id: serial("id").primaryKey().notNull(),
+	public_id: text("public_id"),
+	public_url: text("public_url"),
+	owner: text("owner").references(() => users.id),
+});
+
 export const verification_tokens = pgTable("verification_tokens", {
 	identifier: text("identifier").notNull(),
 	token: text("token").notNull(),

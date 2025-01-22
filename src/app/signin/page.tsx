@@ -8,6 +8,7 @@ import {
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthButton } from "@/components/auth/auth-button";
+import Image from "next/image";
 
 export const runtime = "edge";
 
@@ -19,7 +20,7 @@ export default async function SignInPage({
   // Check if already authenticated
   const session = await auth();
   if (session?.user) {
-    redirect('/home');
+    redirect("/home");
   }
 
   const csrfToken = cookies().get("authjs.csrf-token")?.value ?? "";
@@ -27,6 +28,12 @@ export default async function SignInPage({
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#111111] px-6 text-[#b4b4b4]">
+      <Image
+        src="/images/logo-dark-nobg.png"
+        alt="logo"
+        height="256"
+        width="256"
+      />
       <div className="w-full max-w-md">
         <h1 className="mb-3 text-2xl font-medium text-[#eeeeee]">Sign in</h1>
         <form
@@ -54,7 +61,7 @@ export default async function SignInPage({
               Email
             </label>
             <input
-              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e599] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="email"
               name="email"
               type="email"
@@ -67,7 +74,7 @@ export default async function SignInPage({
               Password
             </label>
             <input
-              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e599] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="password"
               name="password"
               type="password"
@@ -83,7 +90,7 @@ export default async function SignInPage({
 
         <div className="mt-4 text-sm text-[#b4b4b4]">
           Don&apos;t have an account?{" "}
-          <a href="/signup" className="text-[#00e599] hover:underline">
+          <a href="/signup" className="text-[#ec4899] hover:underline">
             Sign up
           </a>
         </div>

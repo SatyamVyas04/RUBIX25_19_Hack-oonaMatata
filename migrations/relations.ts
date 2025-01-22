@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, passwords, sessions, notifications, albums, authenticators, accounts } from "./schema";
+import { users, passwords, sessions, notifications, albums, images, authenticators, accounts } from "./schema";
 
 export const passwordsRelations = relations(passwords, ({one}) => ({
 	user: one(users, {
@@ -13,6 +13,7 @@ export const usersRelations = relations(users, ({many}) => ({
 	sessions: many(sessions),
 	notifications: many(notifications),
 	albums: many(albums),
+	images: many(images),
 	authenticators: many(authenticators),
 	accounts: many(accounts),
 }));
@@ -34,6 +35,13 @@ export const notificationsRelations = relations(notifications, ({one}) => ({
 export const albumsRelations = relations(albums, ({one}) => ({
 	user: one(users, {
 		fields: [albums.mainowner],
+		references: [users.id]
+	}),
+}));
+
+export const imagesRelations = relations(images, ({one}) => ({
+	user: one(users, {
+		fields: [images.owner],
 		references: [users.id]
 	}),
 }));

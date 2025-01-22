@@ -3,6 +3,7 @@
 import React from "react";
 import { AuthButton } from "@/components/auth/auth-button";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -10,6 +11,12 @@ export default function SignUpPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#111111] px-6 text-[#b4b4b4]">
+      <Image
+        src="/images/logo-dark-nobg.png"
+        alt="logo"
+        height="256"
+        width="256"
+      />
       <div className="w-full max-w-md">
         <h1 className="mb-3 text-2xl font-medium text-[#eeeeee]">Sign up</h1>
         <form
@@ -41,7 +48,7 @@ export default function SignUpPage() {
               Name
             </label>
             <input
-              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e599] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="name"
               name="name"
               required
@@ -53,7 +60,7 @@ export default function SignUpPage() {
               Email
             </label>
             <input
-              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e599] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="email"
               name="email"
               type="email"
@@ -66,7 +73,7 @@ export default function SignUpPage() {
               Password
             </label>
             <input
-              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e599] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="password"
               name="password"
               type="password"
@@ -80,7 +87,7 @@ export default function SignUpPage() {
 
         <div className="mt-4 text-sm text-[#b4b4b4]">
           Already have an account?{" "}
-          <a href="/signin" className="text-[#00e599] hover:underline">
+          <a href="/signin" className="text-[#ec4899] hover:underline">
             Sign in
           </a>
         </div>

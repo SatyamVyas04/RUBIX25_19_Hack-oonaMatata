@@ -1,20 +1,11 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-import { SignOut } from "@/components/auth/signout-button";
+import Image from "next/image";
 import { auth } from "@/lib/auth";
-import { Children } from "react";
 
 export default async function Page({
   children,
@@ -22,22 +13,35 @@ export default async function Page({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  console.log(session);
+
   return (
     <SidebarProvider>
-      <AppSidebar  session={session}/>
+      <AppSidebar session={session} />
       <SidebarInset>
-        <header className="sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbPage>October 2024</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+        {/* Header */}
+        <header className="sticky top-0 flex h-16 items-center gap-2 border-b bg-background px-4 sm:justify-start">
+          {/* Sidebar trigger (always visible on the left) */}
+          <SidebarTrigger className="-ml-1 mr-3" />
+
+          {/* Center logo on mobile and align logo with text on larger screens */}
+          <div className="flex flex-1 items-center justify-center sm:justify-start">
+            <Image
+              src="/images/logo-dark-nobg.png"
+              alt="logo"
+              height="48"
+              width="48"
+              className="shrink-0"
+              style={{
+                filter: "drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.75))",
+              }}
+            />
+            <p className="hidden text-2xl font-extrabold sm:ml-2 sm:block">
+              THE MEMORY BOX
+            </p>
+          </div>
         </header>
+
+        {/* Page content */}
         <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
