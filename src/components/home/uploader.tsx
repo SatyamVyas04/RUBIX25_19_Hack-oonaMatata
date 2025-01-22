@@ -1,8 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 import { Button } from "../ui/button";
 import { Session } from "next-auth";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { PlusIcon } from "lucide-react";
 
 const CloudinaryImageUploader = ({ session }: { session: Session | null }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -46,6 +48,7 @@ const CloudinaryImageUploader = ({ session }: { session: Session | null }) => {
     <div>
       <CldUploadWidget
         uploadPreset="raiseume" // Replace with your Cloudinary preset
+        onClose={() => setIsUploading(false)}
         onSuccess={(result) => {
           handleUploadSuccess(result);
           setIsUploading(false);
@@ -63,7 +66,13 @@ const CloudinaryImageUploader = ({ session }: { session: Session | null }) => {
               disabled={isUploading}
               className="rounded-full px-4 py-2 font-bold"
             >
-              {isUploading ? "Uploading..." : "Upload a Memory"}
+              {useIsMobile() ? (
+                <PlusIcon size={24} />
+              ) : isUploading ? (
+                "Uploading..."
+              ) : (
+                "Upload a Memory"
+              )}
             </Button>
           );
         }}
