@@ -1,121 +1,96 @@
 // GET, PATCH, DELETE /api/album/[id]
-import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { Pool } from "@neondatabase/serverless";
+import { sql } from "@neondatabase/serverless";
+import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } },
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   const session = await auth();
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  const albumId = params.id;
+  // Verify user owns the album
+  const { rows } = await sql`
+    SELECT user_id FROM albums WHERE id = ${params.id}
+  `;
 
-  try {
-    const query = `
-      SELECT * FROM albums
-      WHERE id = $1;
-    `;
-
-    const { rows } = await pool.query(query, [albumId]);
-
-    if (rows.length === 0) {
-      return NextResponse.json({ error: "Album not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(rows[0]);
-  } catch (error) {
-    console.error("Error fetching album:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch album" },
-      { status: 500 },
-    );
-  } finally {
-    await pool.end();
+  if (rows.length === 0 || rows[0].user_id !== session.user.id) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
+
+  // Delete album (will cascade to album_images)
+  await sql`DELETE FROM albums WHERE id = ${params.id}`;
+
+  revalidatePath("/album");
+  return new NextResponse(null, { status: 200 });
 }
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } },
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   const session = await auth();
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const albumId = params.id;
-  const updates = await req.json();
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const body = await request.json();
+  const { name, description } = body;
+
+  // Verify user owns the album
+  const { rows } = await sql`
+    SELECT user_id FROM albums WHERE id = ${params.id}
+  `;
+
+  if (rows.length === 0 || rows[0].user_id !== session.user.id) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
 
   try {
-    const fields = Object.keys(updates)
-      .map((key, index) => `${key} = $${index + 2}`)
-      .join(", ");
-
-    const query = `
+    await sql`
       UPDATE albums
-      SET ${fields}
-      WHERE id = $1
-      RETURNING *;
+      SET name = ${name}, description = ${description}
+      WHERE id = ${params.id}
     `;
 
-    const values = [albumId, ...Object.values(updates)];
-    const { rows } = await pool.query(query, values);
-
-    if (rows.length === 0) {
-      return NextResponse.json({ error: "Album not found" }, { status: 404 });
+    revalidatePath("/album");
+    return new NextResponse(null, { status: 200 });
+  } catch (error: any) {
+    if (error.code === "23505") {
+      return new NextResponse("Album name already exists", { status: 400 });
     }
-
-    return NextResponse.json(rows[0]);
-  } catch (error) {
-    console.error("Error updating album:", error);
-    return NextResponse.json(
-      { error: "Failed to update album" },
-      { status: 500 },
-    );
-  } finally {
-    await pool.end();
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } },
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   const session = await auth();
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const albumId = params.id;
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const { rows: [album] } = await sql`
+    SELECT a.*, array_agg(i.*) as images
+    FROM albums a
+    LEFT JOIN album_images ai ON ai.album_id = a.id
+    LEFT JOIN images i ON i.id = ai.image_id
+    WHERE a.id = ${params.id} AND a.user_id = ${session.user.id}
+    GROUP BY a.id
+  `;
 
-  try {
-    const query = `
-      DELETE FROM albums
-      WHERE id = $1
-      RETURNING *;
-    `;
-
-    const { rows } = await pool.query(query, [albumId]);
-
-    if (rows.length === 0) {
-      return NextResponse.json({ error: "Album not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(rows[0]);
-  } catch (error) {
-    console.error("Error deleting album:", error);
-    return NextResponse.json(
-      { error: "Failed to delete album" },
-      { status: 500 },
-    );
-  } finally {
-    await pool.end();
+  if (!album) {
+    return new NextResponse("Not Found", { status: 404 });
   }
+
+  return NextResponse.json(album);
 }

@@ -1,68 +1,48 @@
 // GET and POST /api/album
-import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { Pool } from "@neondatabase/serverless";
+import { sql } from "@neondatabase/serverless";
+import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function POST(request: Request) {
   const session = await auth();
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const pool = new Pool({
-    connectionString: process.env.NEXT_PUBLIC_DATABASE_URL,
-  });
-  //Query to get all albums, ordered by creation date
+  const body = await request.json();
+  const { name, description } = body;
+
   try {
-    const query = `
-      SELECT * FROM albums
-      ORDER BY created_at DESC;
+    await sql`
+      INSERT INTO albums (name, description, user_id)
+      VALUES (${name}, ${description}, ${session.user.id})
     `;
 
-    const { rows } = await pool.query(query);
-    return NextResponse.json(rows);
-  } catch (error) {
-    console.error("Error fetching albums:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch albums" },
-      { status: 500 },
-    );
-  } finally {
-    await pool.end();
+    revalidatePath("/album");
+    return new NextResponse(null, { status: 200 });
+  } catch (error: any) {
+    if (error.code === "23505") {
+      return new NextResponse("Album name already exists", { status: 400 });
+    }
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
-export async function POST(req: Request) {
+export async function GET(request: Request) {
   const session = await auth();
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!session?.user?.id) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const pool = new Pool({
-    connectionString: process.env.NEXT_PUBLIC_DATABASE_URL,
-  });
-  const data = await req.json();
-  //separate the data into fields and values (prevent so called sql injection)
-  try {
-    const fields = Object.keys(data);
-    const values = Object.values(data);
-    const placeholders = values.map((_, i) => `$${i + 1}`).join(", ");
+  const { rows } = await sql`
+    SELECT *
+    FROM albums
+    WHERE user_id = ${session.user.id}
+    ORDER BY created_at DESC
+  `;
 
-    const query = `
-      INSERT INTO albums (${fields.join(", ")})
-      VALUES (${placeholders})
-      RETURNING *;
-    `;
-
-    const { rows } = await pool.query(query, values);
-    return NextResponse.json(rows[0], { status: 201 });
-  } catch (error) {
-    console.error("Error creating album:", error);
-    return NextResponse.json(
-      { error: "Failed to create album" },
-      { status: 500 },
-    );
-  } finally {
-    await pool.end();
-  }
+  return NextResponse.json(rows);
 }
