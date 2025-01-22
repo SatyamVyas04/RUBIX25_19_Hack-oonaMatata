@@ -9,8 +9,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-//Query to get all albums, ordered by creation date
+  const pool = new Pool({
+    connectionString: process.env.NEXT_PUBLIC_DATABASE_URL,
+  });
+  //Query to get all albums, ordered by creation date
   try {
     const query = `
       SELECT * FROM albums
@@ -36,9 +38,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({
+    connectionString: process.env.NEXT_PUBLIC_DATABASE_URL,
+  });
   const data = await req.json();
-//separate the data into fields and values (prevent so called sql injection)
+  //separate the data into fields and values (prevent so called sql injection)
   try {
     const fields = Object.keys(data);
     const values = Object.values(data);
