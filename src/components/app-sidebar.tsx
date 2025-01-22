@@ -1,9 +1,19 @@
-import * as React from "react"
-import { Plus } from "lucide-react"
+"use client";
 
-import { Calendars } from "@/components/calendars"
-import { DatePicker } from "@/components/date-picker"
-import { NavUser } from "@/components/nav-user"
+import * as React from "react";
+import {
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  GalleryVerticalEnd,
+  Sparkle,
+  SquareTerminal,
+} from "lucide-react";
+import Image from "next/image";
+
+import { NavMain } from "@/components/calendars";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +24,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // This is sample data.
 const data = {
@@ -23,48 +33,124 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  calendars: [
+  teams: [
     {
-      name: "My Calendars",
-      items: ["Personal", "Work", "Family"],
+      name: "Acme Inc",
+      logo: GalleryVerticalEnd,
+      plan: "Enterprise",
     },
     {
-      name: "Favorites",
-      items: ["Holidays", "Birthdays"],
+      name: "Acme Corp.",
+      logo: AudioWaveform,
+      plan: "Startup",
     },
     {
-      name: "Other",
-      items: ["Travel", "Reminders", "Deadlines"],
+      name: "Evil Corp.",
+      logo: Command,
+      plan: "Free",
     },
   ],
-}
-
+  navMain: [
+    {
+      title: "Home",
+      url: "#",
+      icon: "home",
+      isActive: true,
+      items: [
+        {
+          title: "Love",
+          url: "#",
+        },
+        {
+          title: "Family",
+          url: "#",
+        },
+        {
+          title: "Pets",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Albums",
+      url: "#",
+      icon: "album",
+      items: [
+        {
+          title: "Life",
+          url: "#",
+        },
+        {
+          title: "Trips",
+          url: "#",
+        },
+        {
+          title: "Office",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Capsules",
+      url: "#",
+      icon: "capsule",
+      items: [
+        {
+          title: "NishitaBday'24",
+          url: "#",
+        },
+        {
+          title: "MyProgress",
+          url: "#",
+        },
+        {
+          title: "GymProgress",
+          url: "#",
+        },
+        {
+          title: "LifeGoals",
+          url: "#",
+        },
+      ],
+    },
+  ],
+};
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   session: any;
 }
 
-export function AppSidebar({ session, ...props } : AppSidebarProps) {
+export function AppSidebar({ session, ...props }: AppSidebarProps) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="h-16 border-b border-sidebar-border">
-        <NavUser user={session.user} />
+      <SidebarHeader className="border-b border-sidebar-border">
+        <Image
+          src="/images/logo-dark-nobg.png"
+          alt="logo"
+          height="216"
+          width="216"
+          className="mx-auto"
+          style={{
+            filter: "drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.75))",
+          }}
+        />
       </SidebarHeader>
       <SidebarContent>
-        <DatePicker />
+        {/* <DatePicker /> */}
         <SidebarSeparator className="mx-0" />
-        <Calendars calendars={data.calendars} />
+        <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton>
-              <Plus />
-              <span>New Calendar</span>
+              <Sparkle />
+              <span>Try our AI features</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          <NavUser user={session.user} />
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

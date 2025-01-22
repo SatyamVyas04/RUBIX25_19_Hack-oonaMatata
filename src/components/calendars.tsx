@@ -1,71 +1,81 @@
-import * as React from "react"
-import { Check, ChevronRight } from "lucide-react"
+"use client";
+
+import { ChevronRight, type LucideIcon } from "lucide-react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
-} from "@/components/ui/sidebar"
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from "@/components/ui/sidebar";
 
-export function Calendars({
-  calendars,
+export function NavMain({
+  items,
 }: {
-  calendars: {
-    name: string
-    items: string[]
-  }[]
+  items: {
+    title: string;
+    url: string;
+    icon?: string;
+    isActive?: boolean;
+    items?: {
+      title: string;
+      url: string;
+    }[];
+  }[];
 }) {
   return (
-    <>
-      {calendars.map((calendar, index) => (
-        <React.Fragment key={calendar.name}>
-          <SidebarGroup key={calendar.name} className="py-0">
-            <Collapsible
-              defaultOpen={index === 0}
-              className="group/collapsible"
-            >
-              <SidebarGroupLabel
-                asChild
-                className="group/label w-full text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              >
-                <CollapsibleTrigger>
-                  {calendar.name}{" "}
-                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
+    <SidebarGroup>
+      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarMenu>
+        {items.map((item) => (
+          <Collapsible
+            key={item.title}
+            asChild
+            defaultOpen={item.isActive}
+            className="group/collapsible"
+          >
+            <SidebarMenuItem>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton tooltip={item.title}>
+                  {item.icon && (
+                    <DotLottieReact
+                      src={`/images/${item.icon}.json`}
+                      className="-ml-2 w-12"
+                      useFrameInterpolation
+                      playOnHover
+                    />
+                  )}
+                  <span className="-ml-2">{item.title}</span>
+                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {calendar.items.map((item, index) => (
-                      <SidebarMenuItem key={item}>
-                        <SidebarMenuButton>
-                          <div
-                            data-active={index < 2}
-                            className="group/calendar-item flex aspect-square size-4 shrink-0 items-center justify-center rounded-sm border border-sidebar-border text-sidebar-primary-foreground data-[active=true]:border-sidebar-primary data-[active=true]:bg-sidebar-primary"
-                          >
-                            <Check className="hidden size-3 group-data-[active=true]/calendar-item:block" />
-                          </div>
-                          {item}
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
+                <SidebarMenuSub>
+                  {item.items?.map((subItem) => (
+                    <SidebarMenuSubItem key={subItem.title}>
+                      <SidebarMenuSubButton asChild>
+                        <a href={subItem.url}>
+                          <span>{subItem.title}</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  ))}
+                </SidebarMenuSub>
               </CollapsibleContent>
-            </Collapsible>
-          </SidebarGroup>
-          <SidebarSeparator className="mx-0" />
-        </React.Fragment>
-      ))}
-    </>
-  )
+            </SidebarMenuItem>
+          </Collapsible>
+        ))}
+      </SidebarMenu>
+    </SidebarGroup>
+  );
 }

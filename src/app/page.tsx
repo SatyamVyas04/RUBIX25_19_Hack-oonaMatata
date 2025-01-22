@@ -1,4 +1,3 @@
-import { SignOut } from "@/components/auth/signout-button";
 import { auth } from "@/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
