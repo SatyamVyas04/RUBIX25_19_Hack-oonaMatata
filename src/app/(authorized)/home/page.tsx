@@ -1,4 +1,4 @@
-"use client";
+
 
 import { auth } from "@/lib/auth";
 import { Pool } from "@neondatabase/serverless";
