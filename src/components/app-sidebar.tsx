@@ -1,9 +1,10 @@
-import * as React from "react"
-import { Plus } from "lucide-react"
+import * as React from "react";
+import { Plus, Image,Home } from "lucide-react"; // Adding 'Image' icon for albums
+import Link from "next/link";
 
-import { Calendars } from "@/components/calendars"
-import { DatePicker } from "@/components/date-picker"
-import { NavUser } from "@/components/nav-user"
+import { Calendars } from "@/components/calendars";
+import { DatePicker } from "@/components/date-picker";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +15,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // This is sample data.
 const data = {
@@ -37,13 +38,13 @@ const data = {
       items: ["Travel", "Reminders", "Deadlines"],
     },
   ],
-}
+};
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   session: any;
 }
 
-export function AppSidebar({ session, ...props } : AppSidebarProps) {
+export function AppSidebar({ session, ...props }: AppSidebarProps) {
   return (
     <Sidebar {...props}>
       <SidebarHeader className="h-16 border-b border-sidebar-border">
@@ -56,15 +57,27 @@ export function AppSidebar({ session, ...props } : AppSidebarProps) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          {/* Link to Albums */}
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Plus />
-              <span>New Calendar</span>
-            </SidebarMenuButton>
+            <Link href="/album">
+              <SidebarMenuButton>
+                <Image />
+                <span>Albums</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+           {/* Link to Home */}
+           <SidebarMenuItem>
+            <Link href="/home">
+              <SidebarMenuButton>
+                <Home />
+                <span>Home</span>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
