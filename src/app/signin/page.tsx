@@ -3,6 +3,7 @@ import {
   INVALID_CREDENTIALS_ERROR_TYPE,
   InvalidCredentials,
   signIn,
+  auth,
 } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -15,9 +16,13 @@ export default async function SignInPage({
 }: {
   searchParams: Record<string, string>;
 }) {
-  // This might not be needed if Auth.js is properly reading cookies.
-  const csrfToken = cookies().get("authjs.csrf-token")?.value ?? "";
+  // Check if already authenticated
+  const session = await auth();
+  if (session?.user) {
+    redirect('/home');
+  }
 
+  const csrfToken = cookies().get("authjs.csrf-token")?.value ?? "";
   const error = searchParams.error;
 
   return (
@@ -33,18 +38,12 @@ export default async function SignInPage({
               await signIn("credentials", {
                 email: formData.get("email"),
                 password: formData.get("password"),
-
-                redirectTo: "/",
+                redirectTo: "/home",
               });
             } catch (error) {
               if (error instanceof InvalidCredentials) {
                 return redirect(`/signin?error=${error.type}`);
               }
-
-              // Otherwise if a redirects happens NextJS can handle it
-              // so you can just re-thrown the error and let NextJS handle it.
-              // Docs:
-              // https://nextjs.org/docs/app/api-reference/functions/redirect#server-component
               throw error;
             }
           }}
@@ -67,7 +66,6 @@ export default async function SignInPage({
             <label className="text-sm" htmlFor="password">
               Password
             </label>
-
             <input
               className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e599] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="password"

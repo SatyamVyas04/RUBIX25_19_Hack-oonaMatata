@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
   const router = useRouter();
-
   const [error, setError] = React.useState<string | undefined>();
 
   return (
@@ -27,7 +26,7 @@ export default function SignUpPage() {
                 throw new Error(responseBody.message || "Unknown error");
               }
 
-              router.push("/");
+              router.push("/home");
             } catch (error: unknown) {
               if (error instanceof Error) {
                 setError(error.message);
@@ -66,7 +65,6 @@ export default function SignUpPage() {
             <label className="text-sm" htmlFor="password">
               Password
             </label>
-
             <input
               className="flex h-10 w-full rounded-lg border border-[#3A3A3A] bg-[#222222] px-3 py-2 text-sm ring-offset-[#111111] transition-colors placeholder:text-[#b4b4b4]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00e599] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="password"
@@ -77,7 +75,7 @@ export default function SignUpPage() {
             />
           </div>
           {error ? <p className="text-sm text-red-500">{error}</p> : null}
-          <AuthButton>Sign up</AuthButton>{" "}
+          <AuthButton>Sign up</AuthButton>
         </form>
 
         <div className="mt-4 text-sm text-[#b4b4b4]">
