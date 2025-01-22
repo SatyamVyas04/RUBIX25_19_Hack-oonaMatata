@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { auth } from "@/lib/auth";
+import CloudinaryImageUploader from "@/components/home/uploader";
 
 export default async function Page({
   children,
@@ -39,6 +40,7 @@ export default async function Page({
               THE MEMORY BOX
             </p>
           </div>
+          <CloudinaryImageUploader session={session} />
         </header>
 
         {/* Page content */}

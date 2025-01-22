@@ -18,24 +18,26 @@ export default async function Home() {
       {/* Navbar */}
       <nav className="fixed top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Image
-            src="/images/logo-dark-nobg.png"
-            alt="logo"
-            height="64"
-            width="64"
-            style={{
-              filter: "drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.75))",
-            }}
-          />
           {!session?.user && (
-            <div className="flex items-center gap-4">
-              <Link href="/signin">
-                <Button variant="ghost">Sign In</Button>
-              </Link>
-              <Link href="/signup">
-                <Button>Get Started</Button>
-              </Link>
-            </div>
+            <>
+              <Image
+                src="/images/logo-dark-nobg.png"
+                alt="logo"
+                height="64"
+                width="64"
+                style={{
+                  filter: "drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.75))",
+                }}
+              />
+              <div className="flex items-center gap-4">
+                <Link href="/signin">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link href="/signup">
+                  <Button>Get Started</Button>
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </nav>
@@ -43,12 +45,23 @@ export default async function Home() {
       {/* Main Content */}
       <div className="relative">
         {session?.user ? (
-          <div className="flex min-h-screen items-center justify-center">
+          <div className="flex min-h-screen flex-col items-center justify-center">
+            <Image
+              src="/images/logo-dark-nobg.png"
+              alt="logo"
+              height="256"
+              width="256"
+              style={{
+                filter: "drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.75))",
+              }}
+            />
             <div className="space-y-3 text-center">
               <p className="text-2xl font-medium">
                 Welcome back, {session.user.name}!
               </p>
-              <Link href={"/home"}>Visit Home</Link>
+              <Button>
+                <Link href={"/home"}>Visit Home</Link>
+              </Button>
             </div>
           </div>
         ) : (
