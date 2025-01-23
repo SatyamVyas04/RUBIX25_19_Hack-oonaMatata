@@ -128,7 +128,7 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
   };
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="container mx-auto px-4 py-2">
       {notification && (
         <div
           className={`fixed right-4 top-4 z-50 rounded-md p-4 shadow-lg ${
