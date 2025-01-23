@@ -187,6 +187,12 @@ export default function HomeClient({ initialImages, userName }: HomeClientProps)
             >
               View Albums
             </Link>
+            <Link
+              href="/timecapsules"
+              className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+            >
+              Time Capsules
+            </Link>
             {!isSelectionMode && (
               <button
                 onClick={() => setIsSelectionMode(true)}

@@ -66,7 +66,7 @@ const data = {
     },
     {
       title: "Capsules",
-      url: "/capsules",
+      url: "/timecapsules",
       icon: "capsule",
       items: [],
     },
