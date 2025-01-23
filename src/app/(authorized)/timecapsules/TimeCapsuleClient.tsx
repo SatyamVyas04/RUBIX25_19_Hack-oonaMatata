@@ -210,10 +210,10 @@ export default function TimeCapsuleClient({
         </button>
       </div>
 
-      {albums.length === 0 ? (
-        <div className="flex min-h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-zinc-300">
-          <p className="text-center text-zinc-500">
-            No capsules yet. Create your first one!
+      {capsules.length === 0 ? (
+        <div className="py-12 text-center">
+          <p className="text-gray-500">
+            No time capsules yet. Create your first one!
           </p>
         </div>
       ) :  (
