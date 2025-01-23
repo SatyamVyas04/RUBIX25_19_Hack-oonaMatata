@@ -1,9 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { CloudinaryImage } from "@/components/cloudinary-image";
+import { Button } from "@/components/ui/button";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 interface Album {
   id: string;
@@ -23,29 +25,47 @@ export default function AlbumDetailClient({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="flex items-center gap-4 mb-6">
+    <main className="container mx-auto px-4 py-2">
+      <div className="mb-6 flex items-center gap-4">
         <Link
           href="/albums"
-          className="flex items-center text-gray-600 hover:text-gray-900"
+          className="flex items-center text-zinc-600 hover:text-zinc-700"
         >
-          <ArrowLeftIcon className="h-5 w-5 mr-2" />
+          <ArrowLeftIcon className="mr-2 h-5 w-5" />
           Back to Albums
         </Link>
       </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{album.name}</h1>
-        {album.description && (
-          <p className="text-gray-600 mb-4">{album.description}</p>
+      <div className="mb-8 flex w-full items-start justify-between sm:flex-row">
+        <div>
+          <h1 className="mb-2 text-3xl font-bold">{album.name}</h1>
+          <h2 className="mb-2 text-sm font-bold text-pink-500">
+            Created by {album.mainowner}
+          </h2>
+          {album.description && (
+            <p className="mb-2 text-sm text-zinc-600">{album.description}</p>
+          )}
+          <p className="text-sm text-zinc-500">
+            {album.images.length}{" "}
+            {album.images.length === 1 ? "photo" : "photos"}
+          </p>
+        </div>
+        {album.mainowner === userEmail && (
+          <Button variant="outline">
+            SHARE{" "}
+            <DotLottieReact
+              src="/images/share.json"
+              className="relative z-10 -mx-4 w-14"
+              useFrameInterpolation
+              autoplay
+              playOnHover
+            />
+          </Button>
         )}
-        <p className="text-sm text-gray-500">
-          {album.images.length} {album.images.length === 1 ? 'photo' : 'photos'}
-        </p>
       </div>
 
       {/* Image Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {album.images.map((imageUrl) => (
           <div
             key={imageUrl}
@@ -57,7 +77,7 @@ export default function AlbumDetailClient({
               alt=""
               width={300}
               height={300}
-              className="object-cover w-full h-full rounded-lg"
+              className="h-full w-full rounded-lg object-cover"
             />
           </div>
         ))}
@@ -66,16 +86,14 @@ export default function AlbumDetailClient({
       {/* Image Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative w-full h-full max-w-4xl max-h-4xl p-4">
+          <div className="max-h-4xl relative h-full w-full max-w-4xl p-4">
             <CloudinaryImage
               src={selectedImage}
               alt=""
-              width={1200}
-              height={800}
-              className="object-contain w-full h-full"
+              className="mx-auto h-screen w-fit object-contain"
             />
           </div>
         </div>

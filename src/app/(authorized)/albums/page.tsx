@@ -3,12 +3,10 @@ import AlbumsClient from "./AlbumsClient";
 
 export default async function AlbumsPage() {
   const session = await auth();
-  
+
   if (!session?.user?.email) {
     return null;
   }
 
-  return (
-    <AlbumsClient userEmail={session.user.email} />
-  );
+  return <AlbumsClient userEmail={session.user.email} />;
 }
