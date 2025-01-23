@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { Pool } from "@neondatabase/serverless";
+import { Resend } from "resend";
+import { AlbumAccessEmail } from "@/../emails/index"; // Import the email component
 
 export async function POST(req: Request) {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     const session = await auth();
@@ -33,7 +36,7 @@ export async function POST(req: Request) {
     // Verify that the current user owns the album or has permission to share it
     const ownershipResult = await pool.query(
       `
-      SELECT 1
+      SELECT mainowner, name
       FROM albums
       WHERE id = $1 AND (mainowner = $2
       OR EXISTS (
@@ -51,6 +54,9 @@ export async function POST(req: Request) {
         { status: 403 },
       );
     }
+
+    // Extract album details
+    const { mainowner: albumOwner, name: albumName } = ownershipResult.rows[0];
 
     // Fetch current collaborators
     const currentAlbumResult = await pool.query(
@@ -82,6 +88,23 @@ export async function POST(req: Request) {
         `,
           [JSON.stringify(currentCollab), albumId],
         );
+
+        // Send email about permission upgrade
+        const mail = await resend.emails.send({
+          from: "onboarding@resend.dev",
+          to: collaborator.userid,
+          subject: `Album Access Updated: ${albumName}`,
+          react: AlbumAccessEmail({
+            senderEmail: albumOwner,
+            receiverEmail: collaborator.userid,
+            permissionGranter: albumOwner,
+            albumLink: `localhost:3000/album/${albumId}`,
+            albumName: albumName,
+            permissionLevel: PermissionLevel.EDIT,
+          }),
+        });
+
+        console.log("Email sent:", mail);
 
         return NextResponse.json({
           message: "Collaborator permission upgraded to editor!",
@@ -119,6 +142,26 @@ export async function POST(req: Request) {
       [JSON.stringify(updatedCollab), albumId],
     );
 
+    // Send welcome email to new collaborator
+    const mail = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: collaborator.userid,
+      subject: `You've been added to album: ${albumName}`,
+      react: AlbumAccessEmail({
+        senderEmail: albumOwner,
+        receiverEmail: collaborator.userid,
+        permissionGranter: albumOwner,
+        albumLink: `localhost:3000/album/${albumId}`,
+        albumName: albumName,
+        permissionLevel:
+          collaborator.permission === "editor"
+            ? PermissionLevel.EDIT
+            : PermissionLevel.VIEW,
+      }),
+    });
+
+    console.log("Email sent:", mail);
+
     return NextResponse.json({
       message: "Collaborator added successfully!",
       collaborator: {
@@ -138,4 +181,11 @@ export async function POST(req: Request) {
   } finally {
     await pool.end();
   }
+}
+
+// Enum for permission levels (make sure to export this)
+export enum PermissionLevel {
+  VIEW = "View",
+  EDIT = "Edit",
+  ADMIN = "Admin",
 }

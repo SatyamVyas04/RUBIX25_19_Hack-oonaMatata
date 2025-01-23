@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, foreignKey, serial, jsonb, boolean, primaryKey, unique, integer } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, foreignKey, serial, boolean, integer, json, primaryKey, unique } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 
@@ -30,18 +30,9 @@ export const notifications = pgTable("notifications", {
 	timestamp: timestamp("timestamp", { withTimezone: true, mode: 'string' }).defaultNow(),
 });
 
-export const albums = pgTable("albums", {
-	id: serial("id").primaryKey().notNull(),
-	name: text("name").notNull(),
-	description: text("description"),
-	images: text("images").default('RRAY[').array(),
-	collab: jsonb("collab").default([]),
-	mainowner: text("mainowner").references(() => users.id),
-});
-
 export const capsules = pgTable("capsules", {
 	id: serial("id").primaryKey().notNull(),
-	albums: integer("albums").array(),
+	albums: text("albums").array(),
 	unlock_time: timestamp("unlock_time", { withTimezone: true, mode: 'string' }),
 	reminders: boolean("reminders").default(false),
 	reminderfreq: text("reminderfreq"),
@@ -55,6 +46,22 @@ export const images = pgTable("images", {
 	public_id: text("public_id"),
 	public_url: text("public_url"),
 	owner: text("owner").references(() => users.id),
+});
+
+export const album_images = pgTable("album_images", {
+	id: serial("id").primaryKey().notNull(),
+	album_id: integer("album_id").notNull(),
+	image_url: text("image_url").notNull(),
+	created_at: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+});
+
+export const albums = pgTable("albums", {
+	id: text("id").primaryKey().notNull(),
+	name: text("name").notNull(),
+	description: text("description"),
+	images: text("images").default('RRAY[').array(),
+	collab: json("collab"),
+	mainowner: text("mainowner"),
 });
 
 export const verification_tokens = pgTable("verification_tokens", {
