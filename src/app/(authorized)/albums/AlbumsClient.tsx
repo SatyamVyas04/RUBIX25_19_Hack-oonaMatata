@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { CloudinaryImage } from "@/components/cloudinary-image";
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -61,17 +61,19 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
   const fetchAlbums = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/albums/get');
+      const response = await fetch("/api/albums/getall");
       const data = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch albums');
+        throw new Error(data.error || "Failed to fetch albums");
       }
-      
+
       setAlbums(data.albums);
     } catch (error) {
-      console.error('Error fetching albums:', error);
-      setError(error instanceof Error ? error.message : 'Failed to fetch albums');
+      console.error("Error fetching albums:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to fetch albums",
+      );
     } finally {
       setLoading(false);
     }
@@ -151,16 +153,16 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-pink-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-red-500">Error: {error}</div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-pink-500">Error: {error}</div>
       </div>
     );
   }
@@ -196,15 +198,18 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
       </div>
 
       {albums.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No albums yet. Create your first album!</p>
+        <div className="py-12 text-center">
+          <p className="text-muted-foreground">
+            No albums yet. Create your first album!
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {albums.map((album) => (
-            <div 
-              key={album.id} 
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+            <Link
+              key={album.id}
+              href={`/albums/${album.id}`}
+              className="block overflow-hidden rounded-md bg-card shadow-lg transition-shadow duration-300 hover:shadow-xl"
             >
               <Link href={`/albums/${album.id}`}>
                 <div className="aspect-w-16 aspect-h-9 relative">
