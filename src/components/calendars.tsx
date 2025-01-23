@@ -42,8 +42,7 @@ export function NavMain({
                     className="relative z-10 -ml-2 w-14"
                     useFrameInterpolation
                     autoplay
-                    loop
-                    speed={0.5}
+                    playOnHover
                   />
                 )}
                 <span className="-ml-2">{item.title}</span>

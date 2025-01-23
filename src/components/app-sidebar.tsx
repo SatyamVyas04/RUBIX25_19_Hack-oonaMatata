@@ -7,6 +7,7 @@ import {
   Bot,
   Command,
   GalleryVerticalEnd,
+  GiftIcon,
   Sparkle,
   SquareTerminal,
 } from "lucide-react";
@@ -112,15 +113,17 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <span className="ml-1">
-              <ModeToggle />
-            </span>
-            <span className="ml-3">Change Theme</span>
+            <div className="flex items-center">
+              <span className="ml-1">
+                <ModeToggle />
+              </span>
+              <span className="ml-3 text-sm">Change Theme</span>
+            </div>
             <SidebarMenuButton>
               <div className="ml-1 mr-2">
-                <Sparkle />
+                <GiftIcon />
               </div>
-              <span>Try our AI features</span>
+              <span className="text-sm">Gift Someone! </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <NavUser user={session.user} />
