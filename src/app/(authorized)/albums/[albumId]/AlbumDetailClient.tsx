@@ -6,13 +6,35 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { CloudinaryImage } from "@/components/cloudinary-image";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
 
+// Improved type definition with more robust validation
 interface Album {
   id: string;
   name: string;
   description: string;
   images: string[];
+  collab: { userid: string; permission: "editor" | "viewer" }[];
   mainowner: string;
+}
+
+interface Collaborator {
+  userid: string;
+  permission: "editor" | "viewer";
 }
 
 export default function AlbumDetailClient({
@@ -23,6 +45,80 @@ export default function AlbumDetailClient({
   userEmail: string;
 }) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [collaborators, setCollaborators] = useState<Collaborator[]>(
+    album.collab,
+  );
+  const [newCollaborator, setNewCollaborator] = useState<Collaborator>({
+    userid: "",
+    permission: "viewer",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // For adding a collaborator
+  const handleAddCollaborator = async () => {
+    try {
+      const response = await fetch("/api/albums/share", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          albumId: album.id,
+          collaborator: {
+            userid: newCollaborator.userid,
+            permission: newCollaborator.permission,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update local state with new collaborator
+        setCollaborators([...collaborators, data.collaborator]);
+        setNewCollaborator({ userid: "", permission: "viewer" });
+        setError(null);
+      } else {
+        setError(data.error || "Failed to add collaborator");
+      }
+    } catch (error) {
+      console.error("Error adding collaborator:", error);
+      setError("Network error. Please try again.");
+    }
+  };
+
+  // For removing a collaborator
+  const handleRemoveCollaborator = async (userid: string) => {
+    try {
+      const response = await fetch("/api/albums/remove", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          albumId: album.id,
+          collaboratorEmail: userid,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update local state by removing the collaborator
+        setCollaborators(
+          collaborators.filter((collab) => collab.userid !== userid),
+        );
+        setError(null);
+      } else {
+        setError(data.error || "Failed to remove collaborator");
+      }
+    } catch (error) {
+      console.error("Error removing collaborator:", error);
+      setError("Network error. Please try again.");
+    }
+  };
 
   return (
     <main className="container mx-auto px-4 py-2">
@@ -51,14 +147,15 @@ export default function AlbumDetailClient({
           </p>
         </div>
         {album.mainowner === userEmail && (
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setIsShareOpen(true)}>
             SHARE{" "}
             <DotLottieReact
               src="/images/share.json"
               className="relative z-10 -mx-4 w-14"
               useFrameInterpolation
               autoplay
-              playOnHover
+              loop
+              speed={0.5}
             />
           </Button>
         )}
@@ -98,6 +195,92 @@ export default function AlbumDetailClient({
           </div>
         </div>
       )}
+
+      {/* Share Popup */}
+      <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Collaborators</DialogTitle>
+          </DialogHeader>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-2 rounded bg-red-100 p-2 text-red-700">
+              {error}
+            </div>
+          )}
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Email</TableHead>
+                <TableHead>Permission</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {collaborators.map((collaborator) => (
+                <TableRow key={collaborator.userid}>
+                  <TableCell>{collaborator.userid}</TableCell>
+                  <TableCell>{collaborator.permission}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="destructive"
+                      onClick={() =>
+                        handleRemoveCollaborator(collaborator.userid)
+                      }
+                      disabled={isLoading}
+                    >
+                      Remove
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {/* Add Collaborator */}
+          <div className="mt-4 space-y-2">
+            <input
+              type="email"
+              placeholder="Collaborator Email"
+              value={newCollaborator.userid}
+              onChange={(e) =>
+                setNewCollaborator((prev) => ({
+                  ...prev,
+                  userid: e.target.value,
+                }))
+              }
+              className="w-full rounded border p-2"
+            />
+            <select
+              value={newCollaborator.permission}
+              onChange={(e) =>
+                setNewCollaborator((prev) => ({
+                  ...prev,
+                  permission: e.target.value as "editor" | "viewer",
+                }))
+              }
+              className="w-full rounded border p-2"
+            >
+              <option value="viewer">Viewer</option>
+              <option value="editor">Editor</option>
+            </select>
+            <Button
+              onClick={handleAddCollaborator}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Adding..." : "Add Collaborator"}
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsShareOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
