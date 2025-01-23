@@ -112,10 +112,10 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>
+            <span className="ml-1">
               <ModeToggle />
-              <span>Change Theme</span>
-            </SidebarMenuButton>
+            </span>
+            <span className="ml-3">Change Theme</span>
             <SidebarMenuButton>
               <div className="ml-1 mr-2">
                 <Sparkle />
