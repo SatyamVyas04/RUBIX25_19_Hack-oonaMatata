@@ -173,8 +173,8 @@ export default function TimeCapsuleClient({
             Create Time Capsule
           </button>
         </div>
-        <div className="flex justify-center items-center h-[calc(100vh-200px)]">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-transparent border-t-4 border-b-4 border-t-pink-500 border-b-pink-500"></div>
+        <div className="flex h-[calc(100vh-200px)] items-center justify-center">
+          <div className="h-16 w-16 animate-spin rounded-full border-4 border-b-4 border-t-4 border-transparent border-b-pink-500 border-t-pink-500"></div>
         </div>
       </main>
     );
@@ -212,16 +212,16 @@ export default function TimeCapsuleClient({
 
       {capsules.length === 0 ? (
         <div className="py-12 text-center">
-          <p className="text-gray-500">
+          <p className="text-zinc-500">
             No time capsules yet. Create your first one!
           </p>
         </div>
-      ) :  (
+      ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {capsules.map((capsule) => (
             <div
               key={capsule.id}
-              className="overflow-hidden rounded-lg bg-zinc shadow-md"
+              className="bg-zinc overflow-hidden rounded-lg shadow-md"
             >
               <div className="aspect-w-16 aspect-h-9 relative">
                 {capsule.images[0] && (
@@ -306,20 +306,20 @@ export default function TimeCapsuleClient({
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
+                    className="text-lg font-medium leading-6 text-zinc-900"
                   >
                     Create Time Capsule
                   </Dialog.Title>
                   <form onSubmit={handleCreateCapsule}>
                     <div className="mt-4 space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-zinc-700">
                           Select Album
                         </label>
                         <select
                           value={selectedAlbumId}
                           onChange={(e) => setSelectedAlbumId(e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           required
                         >
                           <option value="">Select an album</option>
@@ -331,37 +331,37 @@ export default function TimeCapsuleClient({
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-zinc-700">
                           Opening Date
                         </label>
                         <input
                           type="date"
                           value={openingDate}
                           onChange={(e) => setOpeningDate(e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-zinc-700">
                           Opening Time
                         </label>
                         <input
                           type="time"
                           value={openingTime}
                           onChange={(e) => setOpeningTime(e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-zinc-700">
                           Theme
                         </label>
                         <select
                           value={theme}
                           onChange={(e) => setTheme(e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           required
                         >
                           <option value="classic">Classic</option>
@@ -381,11 +381,11 @@ export default function TimeCapsuleClient({
                             id="reminders"
                             checked={reminders}
                             onChange={(e) => setReminders(e.target.checked)}
-                            className="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                            className="h-4 w-4 rounded border-zinc-300 text-blue-500 focus:ring-blue-500"
                           />
                           <label
                             htmlFor="reminders"
-                            className="ml-2 block text-sm text-gray-700"
+                            className="ml-2 block text-sm text-zinc-700"
                           >
                             Enable Reminders
                           </label>
@@ -394,7 +394,7 @@ export default function TimeCapsuleClient({
                           <select
                             value={reminderFreq}
                             onChange={(e) => setReminderFreq(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            className="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           >
                             <option value="never">Never</option>
                             <option value="daily">Daily</option>
@@ -412,11 +412,11 @@ export default function TimeCapsuleClient({
                             onChange={(e) =>
                               setPasswordToggle(e.target.checked)
                             }
-                            className="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                            className="h-4 w-4 rounded border-zinc-300 text-blue-500 focus:ring-blue-500"
                           />
                           <label
                             htmlFor="passwordToggle"
-                            className="ml-2 block text-sm text-gray-700"
+                            className="ml-2 block text-sm text-zinc-700"
                           >
                             Password Protection
                           </label>
@@ -427,7 +427,7 @@ export default function TimeCapsuleClient({
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter password"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            className="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                             required={passwordToggle}
                           />
                         )}
@@ -437,7 +437,7 @@ export default function TimeCapsuleClient({
                     <div className="mt-6 flex justify-end space-x-3">
                       <button
                         type="button"
-                        className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        className="inline-flex justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
                         onClick={() => setIsCreateModalOpen(false)}
                       >
                         Cancel

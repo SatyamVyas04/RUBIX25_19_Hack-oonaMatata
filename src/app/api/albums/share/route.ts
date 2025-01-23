@@ -98,7 +98,7 @@ export async function POST(req: Request) {
             senderEmail: albumOwner,
             receiverEmail: collaborator.userid,
             permissionGranter: albumOwner,
-            albumLink: `localhost:3000/album/${albumId}`,
+            albumLink: `localhost:3000/albums/${albumId}`,
             albumName: albumName,
             permissionLevel: PermissionLevel.EDIT,
           }),
@@ -151,7 +151,7 @@ export async function POST(req: Request) {
         senderEmail: albumOwner,
         receiverEmail: collaborator.userid,
         permissionGranter: albumOwner,
-        albumLink: `localhost:3000/album/${albumId}`,
+        albumLink: `localhost:3000/albums/${albumId}`,
         albumName: albumName,
         permissionLevel:
           collaborator.permission === "editor"

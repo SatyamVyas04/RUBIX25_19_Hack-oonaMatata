@@ -103,7 +103,7 @@ export const AlbumAccessEmail = ({
                 {albumLink}
               </a>
             </Text>
-            <Text className="text-center text-[12px] leading-[20px] text-gray-500">
+            <Text className="text-center text-[12px] leading-[20px] text-zinc-500">
               Sent by {senderEmail}
             </Text>
           </Container>
