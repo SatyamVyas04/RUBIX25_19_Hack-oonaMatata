@@ -27,7 +27,6 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./ui/mode-toggle";
-import { Button } from "./ui/button";
 
 // This is sample data.
 const data = {
@@ -73,9 +72,9 @@ const data = {
       items: [],
     },
     {
-      title: "Share",
-      url: "/share",
-      icon: "share",
+      title: "Gifts",
+      url: "/gifts",
+      icon: "gifting",
       items: [],
     },
     {

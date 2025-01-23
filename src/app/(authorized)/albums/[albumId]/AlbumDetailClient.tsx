@@ -218,25 +218,27 @@ export default function AlbumDetailClient({
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {collaborators.map((collaborator) => (
-                <TableRow key={collaborator.userid}>
-                  <TableCell>{collaborator.userid}</TableCell>
-                  <TableCell>{collaborator.permission}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="destructive"
-                      onClick={() =>
-                        handleRemoveCollaborator(collaborator.userid)
-                      }
-                      disabled={isLoading}
-                    >
-                      Remove
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+            {collaborators.length > 0 && (
+              <TableBody>
+                {collaborators.map((collaborator) => (
+                  <TableRow key={collaborator.userid}>
+                    <TableCell>{collaborator.userid}</TableCell>
+                    <TableCell>{collaborator.permission}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="destructive"
+                        onClick={() =>
+                          handleRemoveCollaborator(collaborator.userid)
+                        }
+                        disabled={isLoading}
+                      >
+                        Remove
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
 
           {/* Add Collaborator */}
