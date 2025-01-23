@@ -218,7 +218,7 @@ export default function AlbumDetailClient({
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
-            {collaborators.length > 0 && (
+            {collaborators?.length > 0 && (
               <TableBody>
                 {collaborators.map((collaborator) => (
                   <TableRow key={collaborator.userid}>
