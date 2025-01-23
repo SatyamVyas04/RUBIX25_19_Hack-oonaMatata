@@ -3,7 +3,13 @@ import { auth } from "@/lib/auth";
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
-  const publicRoutes = ["/", "/signin", "/signup"];
+  const publicRoutes = [
+    "/",
+    "/signin",
+    "/signup",
+    "/api/signin",
+    "/api/signup",
+  ];
 
   if (!publicRoutes.includes(pathname)) {
     if (!req.auth) return NextResponse.redirect(new URL("/", req.url));
