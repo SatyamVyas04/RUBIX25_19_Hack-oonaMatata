@@ -6,6 +6,7 @@ export const runtime = "edge";
 
 interface ImageData {
   public_url: string;
+  date: string;
 }
 
 export default async function HomePage() {
@@ -18,12 +19,15 @@ export default async function HomePage() {
   const userId = userResult.rows[0]?.id;
 
   const imagesResult = await pool.query(
-    "SELECT public_url FROM images WHERE owner = $1",
+    "SELECT public_url, date FROM images WHERE owner = $1",
     [userId],
   );
-  const images: ImageData[] = imagesResult.rows;
+  const images: ImageData[] = imagesResult.rows.map((row) => ({
+    public_url: row.public_url,
+    date: row.date, // Ensure date is included in the images array
+  }));
   await pool.end();
-
+  console.log(images)
   return (
     <HomeClient initialImages={images} userName={session?.user?.name || ""} />
   );
