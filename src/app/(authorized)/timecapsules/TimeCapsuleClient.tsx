@@ -174,13 +174,28 @@ export default function TimeCapsuleClient({
   }, []);
 
   const triggerConfetti = useCallback(() => {
-    const duration = 5000;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+    const duration = 3000;
+    const defaults = { 
+      startVelocity: 45, 
+      spread: 360, 
+      ticks: 100, 
+      zIndex: 9999,
+      shapes: ['square', 'circle'],
+      colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF']
+    };
 
     function randomInRange(min: number, max: number) {
       return Math.random() * (max - min) + min;
     }
 
+    // Initial burst
+    confetti({
+      ...defaults,
+      particleCount: 150,
+      origin: { x: 0.5, y: 0.7 }
+    });
+
+    // Continuous side bursts
     const interval: any = setInterval(function() {
       const timeLeft = duration - Date.now();
 
@@ -188,19 +203,26 @@ export default function TimeCapsuleClient({
         return clearInterval(interval);
       }
 
-      const particleCount = 50 * (timeLeft / duration);
+      const particleCount = 30;
 
+      // Left side burst
       confetti({
         ...defaults,
         particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+        angle: 60,
+        origin: { x: 0, y: 0.7 }
       });
+
+      // Right side burst
       confetti({
         ...defaults,
         particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+        angle: 120,
+        origin: { x: 1, y: 0.7 }
       });
     }, 250);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -280,7 +302,7 @@ export default function TimeCapsuleClient({
             <p className="text-gray-500 mb-4">No time capsules found. Create one to get started!</p>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-500 hover:to-indigo-500"
+              className="inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:from-blue-500 hover:to-indigo-500"
             >
               Create Your First Capsule
             </button>
@@ -291,57 +313,87 @@ export default function TimeCapsuleClient({
           {capsules.map((capsule) => {
             const isUnlocked = canOpenCapsule(capsule.unlock_time);
 
+            const handleUnlock = (e: React.MouseEvent) => {
+              e.preventDefault(); // Prevent the Link navigation
+              
+              // First trigger confetti
+              triggerConfetti();
+
+              // Show success notification
+              setNotification({
+                type: "success",
+                message: " Time Capsule Unlocked! Redirecting to album..."
+              });
+
+              // Wait for confetti and notification before redirecting
+              setTimeout(() => {
+                window.location.href = `/albums/${capsule.albums[0]}`;
+              }, 3000);
+            };
+
             return (
               <div
                 key={capsule.id}
                 className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-xl"
               >
-                <Link href={`/capsule/${capsule.id}`}>
-                  <div className="relative aspect-[4/3]">
-                    {capsule.images && capsule.images[0] ? (
-                      <CloudinaryImage
-                        src={capsule.images[0]}
-                        alt={capsule.album_name}
-                        height={300}
-                        width={400}
-                        className={`h-full w-full object-cover transition-all duration-500 ${
-                          !isUnlocked ? 'blur-sm' : ''
-                        } group-hover:scale-105`}
-                      />
+                <div className="relative aspect-[4/3]">
+                  {capsule.images && capsule.images[0] ? (
+                    <CloudinaryImage
+                      src={capsule.images[0]}
+                      alt={capsule.album_name}
+                      height={300}
+                      width={400}
+                      className={`h-full w-full object-cover transition-all duration-500 ${
+                        !isUnlocked ? 'blur-sm' : ''
+                      } group-hover:scale-105`}
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-gradient-to-br from-gray-100 to-gray-200" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80" />
+                  
+                  {/* Lock Icon with Background */}
+                  <div className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg">
+                    {isUnlocked ? (
+                      <LockOpenIcon className="h-5 w-5 text-green-500" />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-gray-100 to-gray-200" />
+                      <LockClosedIcon className="h-5 w-5 text-red-500" />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80" />
-                    
-                    {/* Lock Icon with Background */}
-                    <div className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg">
-                      {isUnlocked ? (
-                        <LockOpenIcon className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <LockClosedIcon className="h-5 w-5 text-red-500" />
-                      )}
-                    </div>
-
-                    {/* Content Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h3 className="mb-1 text-lg font-semibold text-white">
-                        {capsule.album_name}
-                      </h3>
-                      <p className="text-sm text-white/90">
-                        {isUnlocked ? (
-                          <span className="flex items-center gap-1">
-                            <span className="inline-block h-2 w-2 rounded-full bg-green-500"></span>
-                            Unlocked
-                          </span>
-                        ) : (
-                          <span>
-                            Opens {new Date(capsule.unlock_time).toLocaleDateString()}
-                          </span>
-                        )}
-                      </p>
-                    </div>
                   </div>
-                </Link>
+
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h3 className="mb-1 text-lg font-semibold text-white">
+                      {capsule.album_name}
+                    </h3>
+                    <p className="text-sm text-white/90">
+                      {isUnlocked ? (
+                        <span className="flex items-center gap-1">
+                          <span className="inline-block h-2 w-2 rounded-full bg-green-500"></span>
+                          Ready to Open!
+                        </span>
+                      ) : (
+                        <span>
+                          Opens {new Date(capsule.unlock_time).toLocaleDateString()}
+                        </span>
+                      )}
+                    </p>
+                    {isUnlocked ? (
+                      <button
+                        onClick={handleUnlock}
+                        className="mt-3 w-full animate-pulse rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:from-green-600 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                      >
+                         Open Time Capsule
+                      </button>
+                    ) : (
+                      <Link href={`/capsule/${capsule.id}`} className="mt-3 block w-full">
+                        <p className="w-full rounded-md bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:from-blue-600 hover:to-indigo-600">
+                          Locked
+                        </p>
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })}
