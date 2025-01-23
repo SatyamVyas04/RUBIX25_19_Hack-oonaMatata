@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { albumId, openAt, theme, reminders = false, reminderfreq = 'never', passwordtoggle = false, password = null } = await request.json();
+    const { albumId, openAt, theme = 'classic', reminders = false, reminderfreq = 'never', passwordtoggle = false, password = null } = await request.json();
     
     if (!albumId || !openAt || !theme) {
       return NextResponse.json({ error: 'Album ID, opening time, and theme are required' }, { status: 400 });
@@ -17,10 +17,10 @@ export async function POST(request: Request) {
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-    // Create capsule
+    // Create capsule with albums as integer array
     const result = await pool.query(
       `INSERT INTO capsules (albums, unlock_time, theme, passwordtoggle, reminders, reminderfreq, password) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7) 
+       VALUES (ARRAY[$1]::integer[], $2, $3, $4, $5, $6, $7) 
        RETURNING *`,
       [albumId, openAt, theme, passwordtoggle, reminders, reminderfreq, password]
     );
@@ -50,11 +50,11 @@ export async function GET(request: Request) {
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-    // Get all capsules for the user
+    // Get all capsules for the user, handling albums as an array
     const result = await pool.query(
       `SELECT c.*, a.name as album_name, a.images 
        FROM capsules c
-       JOIN albums a ON c.albums = a.id
+       JOIN albums a ON a.id = ANY(c.albums)
        WHERE a.mainowner = $1
        ORDER BY c.unlock_time ASC`,
       [session.user.email]

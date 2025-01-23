@@ -133,7 +133,9 @@ export default function CapsuleClient({ userEmail }: { userEmail: string }) {
             return (
               <div
                 key={capsule.id}
-                className={`rounded-lg shadow-md overflow-hidden ${themeColor} transition-all duration-300 hover:shadow-lg`}
+                className={`rounded-lg shadow-md overflow-hidden ${themeColor} transition-all duration-300 hover:shadow-lg ${
+                  !isLocked && !capsule.passwordtoggle ? 'cursor-pointer' : ''
+                }`}
                 onClick={() => !isLocked && handleCapsuleClick(capsule)}
                 role="button"
                 tabIndex={0}
@@ -172,17 +174,22 @@ export default function CapsuleClient({ userEmail }: { userEmail: string }) {
                         </>
                       )}
                     </p>
-                    {capsule.reminders && (
-                      <p className="text-sm text-gray-600">
-                        Reminders: {capsule.reminderfreq}
-                      </p>
-                    )}
-                    {capsule.passwordtoggle && (
-                      <p className="text-sm text-gray-600">
-                        <LockClosedIcon className="h-4 w-4 inline mr-1" />
-                        Password protected
-                      </p>
-                    )}
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <span className="px-2 py-1 bg-white bg-opacity-50 rounded-full">
+                        Theme: {capsule.theme}
+                      </span>
+                      {capsule.reminders && (
+                        <span className="px-2 py-1 bg-white bg-opacity-50 rounded-full">
+                          Reminders: {capsule.reminderfreq}
+                        </span>
+                      )}
+                      {capsule.passwordtoggle && (
+                        <span className="px-2 py-1 bg-white bg-opacity-50 rounded-full flex items-center">
+                          <LockClosedIcon className="h-3 w-3 mr-1" />
+                          Password Protected
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -16,11 +16,15 @@ interface Album {
 
 interface TimeCapsule {
   id: string;
-  album_id: string;
+  albums: number[];
   album_name: string;
-  open_at: string;
+  unlock_time: string;
   created_at: string;
-  is_opened: boolean;
+  theme: string;
+  reminders: boolean;
+  reminderfreq: string;
+  passwordtoggle: boolean;
+  password?: string;
   images: string[];
 }
 
@@ -31,6 +35,11 @@ export default function TimeCapsuleClient({ userEmail }: { userEmail: string }) 
   const [selectedAlbumId, setSelectedAlbumId] = useState('');
   const [openingDate, setOpeningDate] = useState('');
   const [openingTime, setOpeningTime] = useState('');
+  const [theme, setTheme] = useState('classic');
+  const [reminders, setReminders] = useState(false);
+  const [reminderFreq, setReminderFreq] = useState('never');
+  const [passwordToggle, setPasswordToggle] = useState(false);
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<{
@@ -103,6 +112,11 @@ export default function TimeCapsuleClient({ userEmail }: { userEmail: string }) 
         body: JSON.stringify({
           albumId: selectedAlbumId,
           openAt: openAtDate.toISOString(),
+          theme,
+          reminders,
+          reminderfreq: reminderFreq,
+          passwordtoggle: passwordToggle,
+          password: passwordToggle ? password : null,
         }),
       });
 
@@ -123,6 +137,11 @@ export default function TimeCapsuleClient({ userEmail }: { userEmail: string }) 
       setSelectedAlbumId('');
       setOpeningDate('');
       setOpeningTime('');
+      setTheme('classic');
+      setReminders(false);
+      setReminderFreq('never');
+      setPasswordToggle(false);
+      setPassword('');
     } catch (error) {
       setNotification({
         type: 'error',
@@ -193,10 +212,10 @@ export default function TimeCapsuleClient({ userEmail }: { userEmail: string }) 
                       width={400}
                       height={300}
                       className={`object-cover w-full h-full ${
-                        !canOpenCapsule(capsule.open_at) ? 'blur-lg' : ''
+                        !canOpenCapsule(capsule.unlock_time) ? 'blur-lg' : ''
                       }`}
                     />
-                    {!canOpenCapsule(capsule.open_at) && (
+                    {!canOpenCapsule(capsule.unlock_time) && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <LockClosedIcon className="h-12 w-12 text-white" />
                       </div>
@@ -206,23 +225,23 @@ export default function TimeCapsuleClient({ userEmail }: { userEmail: string }) 
               </div>
               <div className="p-4">
                 <h3 className="font-semibold text-lg mb-1">{capsule.album_name}</h3>
-                <p className="text-sm text-gray-500 mb-2">
-                  Opens: {new Date(capsule.open_at).toLocaleString()}
-                </p>
-                {canOpenCapsule(capsule.open_at) ? (
-                  <Link
-                    href={`/albums/${capsule.album_id}`}
-                    className="inline-flex items-center text-blue-500 hover:text-blue-600"
-                  >
-                    <LockOpenIcon className="h-4 w-4 mr-1" />
-                    View Album
-                  </Link>
-                ) : (
-                  <p className="text-gray-400 flex items-center">
-                    <LockClosedIcon className="h-4 w-4 mr-1" />
-                    Locked
+                <div className="space-y-2">
+                  <p className="text-sm">
+                    {!canOpenCapsule(capsule.unlock_time) ? (
+                      <>
+                        <LockClosedIcon className="h-4 w-4 inline mr-1" />
+                        Opens {new Date(capsule.unlock_time).toLocaleString()}
+                      </>
+                    ) : (
+                      <>
+                        <LockOpenIcon className="h-4 w-4 inline mr-1" />
+                        <Link href={`/albums/${capsule.albums[0]}`} className="text-blue-500 hover:text-blue-600">
+                          View Album
+                        </Link>
+                      </>
+                    )}
                   </p>
-                )}
+                </div>
               </div>
             </div>
           ))}
@@ -309,6 +328,76 @@ export default function TimeCapsuleClient({ userEmail }: { userEmail: string }) 
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           required
                         />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Theme
+                        </label>
+                        <select
+                          value={theme}
+                          onChange={(e) => setTheme(e.target.value)}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          required
+                        >
+                          <option value="classic">Classic</option>
+                          <option value="vintage">Vintage</option>
+                          <option value="modern">Modern</option>
+                          <option value="dark">Dark</option>
+                          <option value="nature">Nature</option>
+                          <option value="sunset">Sunset</option>
+                          <option value="ocean">Ocean</option>
+                          <option value="royal">Royal</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="reminders"
+                            checked={reminders}
+                            onChange={(e) => setReminders(e.target.checked)}
+                            className="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="reminders" className="ml-2 block text-sm text-gray-700">
+                            Enable Reminders
+                          </label>
+                        </div>
+                        {reminders && (
+                          <select
+                            value={reminderFreq}
+                            onChange={(e) => setReminderFreq(e.target.value)}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          >
+                            <option value="never">Never</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                          </select>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="passwordToggle"
+                            checked={passwordToggle}
+                            onChange={(e) => setPasswordToggle(e.target.checked)}
+                            className="h-4 w-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="passwordToggle" className="ml-2 block text-sm text-gray-700">
+                            Password Protection
+                          </label>
+                        </div>
+                        {passwordToggle && (
+                          <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter password"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            required={passwordToggle}
+                          />
+                        )}
                       </div>
                     </div>
 
