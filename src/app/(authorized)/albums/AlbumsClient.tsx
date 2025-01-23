@@ -1,29 +1,18 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CloudinaryImage } from "@/components/cloudinary-image";
+import { ClockIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { LockClosedIcon, ClockIcon } from '@heroicons/react/24/solid';
 
 interface Album {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   images: string[];
   mainowner: string;
-}
-
-interface TimeCapsule {
-  id: string;
-  albums: string;
-  unlock_time: string;
-  theme: string;
-  reminders: boolean;
-  reminderfreq: 'never' | 'daily' | 'weekly' | 'monthly';
-  passwordtoggle: boolean;
-  password?: string;
 }
 
 const THEMES = [
@@ -39,8 +28,10 @@ const THEMES = [
 
 export default function AlbumsClient({ userEmail }: { userEmail: string }) {
   const [albums, setAlbums] = useState<Album[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const [isCreateCapsuleOpen, setIsCreateCapsuleOpen] = useState(false);
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
   const [openingDate, setOpeningDate] = useState('');
@@ -49,10 +40,6 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
   const [reminderFreq, setReminderFreq] = useState<'never' | 'daily' | 'weekly' | 'monthly'>('never');
   const [passwordToggle, setPasswordToggle] = useState(false);
   const [password, setPassword] = useState('');
-  const [notification, setNotification] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
 
   useEffect(() => {
     fetchAlbums();
@@ -60,22 +47,15 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
 
   const fetchAlbums = async () => {
     try {
-      setLoading(true);
-      const response = await fetch("/api/albums/getall");
+      const response = await fetch("/api/albums/get");
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch albums");
+      if (response.ok) {
+        setAlbums(data.albums);
+      } else {
+        console.error("Failed to fetch albums:", data.error);
       }
-
-      setAlbums(data.albums);
     } catch (error) {
       console.error("Error fetching albums:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to fetch albums",
-      );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -84,7 +64,7 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
     if (!selectedAlbum || !openingDate || !openingTime || !selectedTheme) {
       setNotification({
         type: 'error',
-        message: 'Please fill in all fields'
+        message: 'Please fill in all required fields'
       });
       return;
     }
@@ -123,7 +103,7 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
 
       setNotification({
         type: 'success',
-        message: 'Capsule created successfully!'
+        message: 'Time capsule created successfully!'
       });
       setIsCreateCapsuleOpen(false);
       
@@ -135,10 +115,6 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
       setReminderFreq('never');
       setPasswordToggle(false);
       setPassword('');
-
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
     } catch (error) {
       setNotification({
         type: 'error',
@@ -147,50 +123,30 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
     }
   };
 
-  const canOpenCapsule = (unlockTime: string) => {
-    return new Date(unlockTime) <= new Date();
-  };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-pink-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-pink-500">Error: {error}</div>
-      </div>
-    );
-  }
-
   return (
     <main className="container mx-auto px-4 py-8">
       {notification && (
         <div
           className={`fixed top-4 right-4 z-50 p-4 rounded-md shadow-lg ${
-            notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            notification.type === "success" ? "bg-green-500" : "bg-red-500"
           } text-white`}
         >
           {notification.message}
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Your Albums</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground">Your Albums</h1>
         <div className="space-x-4">
-          <Link 
-            href="/home" 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          <Link
+            href="/home"
+            className="rounded-md bg-pink-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-pink-600"
           >
             Create New Album
           </Link>
           <Link
             href="/timecapsules"
-            className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+            className="rounded-md bg-purple-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-600"
           >
             View Capsules
           </Link>
@@ -198,57 +154,68 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
       </div>
 
       {albums.length === 0 ? (
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            No albums yet. Create your first album!
+        <div className="flex min-h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-gray-300">
+          <p className="text-center text-gray-500">
+            No albums yet. Create your first one!
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {albums.map((album) => (
-            <Link
+            <div
               key={album.id}
-              href={`/albums/${album.id}`}
               className="block overflow-hidden rounded-md bg-card shadow-lg transition-shadow duration-300 hover:shadow-xl"
             >
-              <Link href={`/albums/${album.id}`}>
-                <div className="aspect-w-16 aspect-h-9 relative">
+              <div className="aspect-w-16 aspect-h-9 relative">
+                <Link href={`/albums/${album.id}`}>
                   {album.images[0] ? (
                     <CloudinaryImage
                       src={album.images[0]}
                       alt={album.name}
                       width={400}
                       height={300}
-                      className="object-cover w-full h-full"
+                      className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">No images</span>
+                    <div className="flex h-full w-full items-center justify-center bg-muted">
+                      <span className="text-muted-foreground">No images</span>
                     </div>
                   )}
-                </div>
-              </Link>
+                </Link>
+              </div>
               <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-semibold text-lg">{album.name}</h3>
-                    {album.description && (
-                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{album.description}</p>
-                    )}
-                    <p className="text-gray-500 text-sm">
-                      {album.images.length} {album.images.length === 1 ? 'photo' : 'photos'}
-                    </p>
+                <div className="flex items-start justify-between">
+                  <Link href={`/albums/${album.id}`} className="flex-1">
+                    <div>
+                      <h3 className="mb-1 text-lg font-semibold text-foreground hover:text-pink-500">
+                        {album.name}
+                      </h3>
+                      {album.description && (
+                        <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
+                          {album.description}
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        {album.images.length}{" "}
+                        {album.images.length === 1 ? "photo" : "photos"}
+                      </p>
+                    </div>
+                  </Link>
+                  <div className="flex items-center space-x-2">
+                    <div className="rounded-full bg-pink-500 px-2 py-1 text-xs font-bold text-white">
+                      {album.mainowner === userEmail ? "Owner" : "Collaborator"}
+                    </div>
+                    <button
+                      className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedAlbum(album);
+                        setIsCreateCapsuleOpen(true);
+                      }}
+                    >
+                      <ClockIcon className="h-6 w-6" />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      setSelectedAlbum(album);
-                      setIsCreateCapsuleOpen(true);
-                    }}
-                    className="text-purple-500 hover:text-purple-600"
-                    title="Create Time Capsule"
-                  >
-                    <ClockIcon className="h-6 w-6" />
-                  </button>
                 </div>
               </div>
             </div>
@@ -354,36 +321,21 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Reminders
                         </label>
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={reminderFreq !== 'never'}
-                            onChange={(e) => setReminderFreq(e.target.checked ? 'daily' : 'never')}
-                            className="rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                          />
-                          <span className="text-sm">Send reminders</span>
-                        </div>
-                        {reminderFreq !== 'never' && (
-                          <div className="mt-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Reminder Frequency
-                            </label>
-                            <select
-                              value={reminderFreq}
-                              onChange={(e) => setReminderFreq(e.target.value as 'daily' | 'weekly' | 'monthly')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                            >
-                              <option value="daily">Daily</option>
-                              <option value="weekly">Weekly</option>
-                              <option value="monthly">Monthly</option>
-                            </select>
-                          </div>
-                        )}
+                        <select
+                          value={reminderFreq}
+                          onChange={(e) => setReminderFreq(e.target.value as 'never' | 'daily' | 'weekly' | 'monthly')}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                        >
+                          <option value="never">Never</option>
+                          <option value="daily">Daily</option>
+                          <option value="weekly">Weekly</option>
+                          <option value="monthly">Monthly</option>
+                        </select>
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Password
+                          Password Protection
                         </label>
                         <div className="flex items-center space-x-2">
                           <input
@@ -400,6 +352,7 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
                               type="password"
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
+                              placeholder="Enter password"
                               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
                               required
                             />
