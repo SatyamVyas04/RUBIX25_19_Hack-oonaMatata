@@ -1,10 +1,9 @@
--- Drop existing capsules table if it exists
-DROP TABLE IF EXISTS capsules;
+-- Drop the existing table and recreate it with text[] type
+DROP TABLE IF EXISTS capsules CASCADE;
 
--- Create capsules table with albums as text array
 CREATE TABLE capsules (
     id SERIAL PRIMARY KEY,
-    albums TEXT[] NOT NULL,
+    albums text[] NOT NULL,
     unlock_time TIMESTAMP WITH TIME ZONE NOT NULL,
     theme VARCHAR(50) NOT NULL DEFAULT 'classic',
     reminders BOOLEAN NOT NULL DEFAULT false,

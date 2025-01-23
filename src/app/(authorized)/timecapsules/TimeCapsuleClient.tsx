@@ -16,7 +16,7 @@ interface Album {
 
 interface TimeCapsule {
   id: string;
-  albums: number[];
+  albums: string[];
   album_name: string;
   unlock_time: string;
   created_at: string;

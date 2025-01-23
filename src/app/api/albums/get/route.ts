@@ -12,18 +12,30 @@ export async function GET() {
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
     // Get all albums where user is mainowner or collaborator
+    // Also check if album is in a time capsule
     const albumsResult = await pool.query(
-      `SELECT * FROM albums 
-       WHERE mainowner = $1 
-       OR $1 = ANY(SELECT jsonb_array_elements_text(collab))
-       ORDER BY id DESC`,
+      `WITH locked_albums AS (
+        SELECT DISTINCT unnest(albums) as album_id
+        FROM capsules
+        WHERE unlock_time > NOW()
+      )
+      SELECT a.*, 
+        CASE WHEN la.album_id IS NOT NULL THEN true ELSE false END as is_locked
+      FROM albums a
+      LEFT JOIN locked_albums la ON a.id = la.album_id
+      WHERE a.mainowner = $1 
+      OR (a.collab IS NOT NULL AND a.collab::text LIKE '%' || $1 || '%')
+      ORDER BY a.id DESC`,
       [session.user.email]
     );
 
     await pool.end();
 
+    // Filter out locked albums from the response
+    const unlockedAlbums = albumsResult.rows.filter(album => !album.is_locked);
+
     return NextResponse.json({ 
-      albums: albumsResult.rows 
+      albums: unlockedAlbums 
     });
   } catch (error) {
     console.error('Error fetching albums:', error);

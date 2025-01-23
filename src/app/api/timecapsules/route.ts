@@ -17,10 +17,10 @@ export async function POST(request: Request) {
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-    // Create capsule with albums as integer array
+    // Store the full album ID as a text array
     const result = await pool.query(
       `INSERT INTO capsules (albums, unlock_time, theme, passwordtoggle, reminders, reminderfreq, password) 
-       VALUES (ARRAY[$1]::integer[], $2, $3, $4, $5, $6, $7) 
+       VALUES (ARRAY[$1]::text[], $2, $3, $4, $5, $6, $7) 
        RETURNING *`,
       [albumId, openAt, theme, passwordtoggle, reminders, reminderfreq, password]
     );
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-    // Get all capsules for the user, handling albums as an array
+    // Get all capsules for the user, using direct comparison with text array
     const result = await pool.query(
       `SELECT c.*, a.name as album_name, a.images 
        FROM capsules c
