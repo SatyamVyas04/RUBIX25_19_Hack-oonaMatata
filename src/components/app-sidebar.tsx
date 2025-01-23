@@ -56,62 +56,31 @@ const data = {
       url: "#",
       icon: "home",
       isActive: true,
-      items: [
-        {
-          title: "Love",
-          url: "#",
-        },
-        {
-          title: "Family",
-          url: "#",
-        },
-        {
-          title: "Pets",
-          url: "#",
-        },
-      ],
+      items: [],
     },
     {
       title: "Albums",
-      url: "#",
+      url: "/albums",
       icon: "album",
-      items: [
-        {
-          title: "Life",
-          url: "#",
-        },
-        {
-          title: "Trips",
-          url: "#",
-        },
-        {
-          title: "Office",
-          url: "#",
-        },
-      ],
+      items: [],
     },
     {
       title: "Capsules",
-      url: "#",
+      url: "/capsules",
       icon: "capsule",
-      items: [
-        {
-          title: "NishitaBday'24",
-          url: "#",
-        },
-        {
-          title: "MyProgress",
-          url: "#",
-        },
-        {
-          title: "GymProgress",
-          url: "#",
-        },
-        {
-          title: "LifeGoals",
-          url: "#",
-        },
-      ],
+      items: [],
+    },
+    {
+      title: "Share",
+      url: "/share",
+      icon: "share",
+      items: [],
+    },
+    {
+      title: "Notifs",
+      url: "/notifs",
+      icon: "notifs",
+      items: [],
     },
   ],
 };
