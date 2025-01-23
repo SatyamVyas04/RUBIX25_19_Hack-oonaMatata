@@ -1,48 +1,84 @@
-// GET and POST /api/album
-import { auth } from "@/lib/auth";
-import { sql } from "@neondatabase/serverless";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { Pool } from "@neondatabase/serverless";
 
-export async function POST(request: Request) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
-  const body = await request.json();
-  const { name, description } = body;
+export async function GET() {
+  const pool = new Pool({
+    connectionString: process.env.NEXT_PUBLIC_DATABASE_URL,
+  });
 
   try {
-    await sql`
-      INSERT INTO albums (name, description, user_id)
-      VALUES (${name}, ${description}, ${session.user.id})
-    `;
+    const query = `SELECT * FROM albums`;
+    const { rows } = await pool.query(query);
 
-    revalidatePath("/album");
-    return new NextResponse(null, { status: 200 });
-  } catch (error: any) {
-    if (error.code === "23505") {
-      return new NextResponse("Album name already exists", { status: 400 });
-    }
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error("Error fetching albums:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch albums" },
+      { status: 500 },
+    );
+  } finally {
+    await pool.end();
   }
 }
 
-export async function GET(request: Request) {
-  const session = await auth();
+import { auth } from "@/lib/auth";
 
-  if (!session?.user?.id) {
-    return new NextResponse("Unauthorized", { status: 401 });
+export async function POST(req: Request) {
+  const session = await auth();
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { rows } = await sql`
-    SELECT *
-    FROM albums
-    WHERE user_id = ${session.user.id}
-    ORDER BY created_at DESC
-  `;
+  const { name, description, images, collab } = await req.json();
 
-  return NextResponse.json(rows);
+  if (!name) {
+    return NextResponse.json(
+      { error: "Missing required field: name" },
+      { status: 400 },
+    );
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.NEXT_PUBLIC_DATABASE_URL,
+  });
+
+  try {
+    const userQuery = `SELECT id FROM users WHERE email = $1`;
+    const userResult = await pool.query(userQuery, [session.user.email]);
+    const mainowner = userResult.rows[0]?.id;
+
+    if (!mainowner) {
+      return NextResponse.json(
+        { error: "User not found in database" },
+        { status: 404 },
+      );
+    }
+
+    const query = `
+      INSERT INTO albums (name, description, images, collab, mainowner)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
+
+    const values = [
+      name,
+      description || null,
+      images || [],
+      collab || [],
+      mainowner,
+    ];
+
+    const { rows } = await pool.query(query, values);
+
+    return NextResponse.json(rows[0]);
+  } catch (error) {
+    console.error("Error inserting album record:", error);
+    return NextResponse.json(
+      { error: "Failed to save album record" },
+      { status: 500 },
+    );
+  } finally {
+    await pool.end();
+  }
 }
