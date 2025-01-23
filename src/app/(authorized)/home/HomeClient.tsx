@@ -199,12 +199,6 @@ export default function HomeClient({
                 View Albums
               </Button>
             </Link>
-            <Link
-              href="/timecapsules"
-              className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
-            >
-              Time Capsules
-            </Link>
             {!isSelectionMode && (
               <Button
                 onClick={() => setIsSelectionMode(true)}
@@ -252,14 +246,14 @@ export default function HomeClient({
         </div>
 
         <div className="w-full p-2">
-          <div className="columns-1 gap-4 sm:columns-2 md:columns-3 lg:columns-4">
+          <div className="columns-1 gap-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5">
             {images.map((image, index) => (
               <BlurFade
                 key={image.public_url}
                 delay={0.25 + index * 0.05}
                 inView
               >
-                <div key={index} className="mb-4 break-inside-avoid">
+                <div key={index} className="mb-2 break-inside-avoid">
                   <div
                     className={`group relative cursor-pointer ${
                       isSelectionMode ? "hover:opacity-90" : ""

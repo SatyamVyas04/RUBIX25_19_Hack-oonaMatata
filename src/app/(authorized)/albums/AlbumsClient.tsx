@@ -170,7 +170,7 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
               key={album.id}
               className="block overflow-hidden rounded-md bg-card shadow-lg transition-shadow duration-300 hover:shadow-xl"
             >
-              <div className="relative h-[300px] w-[300px] overflow-hidden rounded-xl">
+              <div className="relative h-[300px] w-[300px] overflow-hidden rounded-md">
                 <Link href={`/albums/${album.id}`}>
                   {album.images[0] ? (
                     <CloudinaryImage
