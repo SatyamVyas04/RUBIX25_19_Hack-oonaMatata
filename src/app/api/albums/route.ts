@@ -33,12 +33,7 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    // Drop existing albums table if it exists
-    await pool.query(`
-      DROP TABLE IF EXISTS albums CASCADE
-    `);
-
-    // Create albums table without foreign key constraint
+    // Create albums table if it doesn't exist
     await pool.query(`
       CREATE TABLE IF NOT EXISTS albums (
         id TEXT PRIMARY KEY,
