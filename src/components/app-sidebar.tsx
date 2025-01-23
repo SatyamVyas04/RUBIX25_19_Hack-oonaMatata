@@ -25,6 +25,8 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { ModeToggle } from "./ui/mode-toggle";
+import { Button } from "./ui/button";
 
 // This is sample data.
 const data = {
@@ -53,9 +55,8 @@ const data = {
   navMain: [
     {
       title: "Home",
-      url: "#",
+      url: "/home",
       icon: "home",
-      isActive: true,
       items: [],
     },
     {
@@ -112,7 +113,13 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton>
-              <Sparkle />
+              <ModeToggle />
+              <span>Change Theme</span>
+            </SidebarMenuButton>
+            <SidebarMenuButton>
+              <div className="ml-1 mr-2">
+                <Sparkle />
+              </div>
               <span>Try our AI features</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
