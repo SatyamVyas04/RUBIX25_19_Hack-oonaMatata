@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-
+import { FacebookShareButton, TwitterShareButton, WhatsappShareButton, LinkedinShareButton, EmailShareButton } from "next-share";
 import { useState, useEffect } from "react";
 import { CloudinaryImage } from "@/components/cloudinary-image";
 import ClientVideoPlayer from "@/components/home/ClientVideoPlayer";
@@ -30,6 +30,7 @@ export default function HomeClient({
   initialImages,
   userName,
 }: HomeClientProps) {
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
   const [images] = useState<ImageData[]>(initialImages);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -163,6 +164,61 @@ export default function HomeClient({
     }
   };
 
+  const handleSelectAll = () => {
+    const allImages = initialImages.map(image => image.public_url);
+    setSelectedImages(allImages);
+  };
+
+  const handleShare = () => {
+    const title = "Check out these images!";
+    const imageUrls = selectedImages.join(", ");
+
+    switch (selectedPlatform) {
+      case "facebook":
+        return (
+          <FacebookShareButton url={imageUrls} quote={title}>
+            <Button className="rounded-sm px-4 py-2 text-center bg-blue-600 hover:bg-blue-700 dark:text-white">
+              Share on Facebook
+            </Button>
+          </FacebookShareButton>
+        );
+      case "twitter":
+        return (
+          <TwitterShareButton url={imageUrls} title={title}>
+            <Button className="rounded-sm px-4 py-2 text-center bg-blue-400 hover:bg-blue-500 dark:text-white">
+              Share on Twitter
+            </Button>
+          </TwitterShareButton>
+        );
+      case "whatsapp":
+        return (
+          <WhatsappShareButton url={imageUrls} title={title}>
+            <Button className="rounded-sm px-4 py-2 text-center bg-green-500 hover:bg-green-600 dark:text-white">
+              Share on WhatsApp
+            </Button>
+          </WhatsappShareButton>
+        );
+      case "linkedin":
+        return (
+          <LinkedinShareButton url={imageUrls} title={title}>
+            <Button className="rounded-sm px-4 py-2 text-center bg-blue-700 hover:bg-blue-800 dark:text-white">
+              Share on LinkedIn
+            </Button>
+          </LinkedinShareButton>
+        );
+      case "email":
+        return (
+          <EmailShareButton url={imageUrls} subject={title} body="Check out these images!">
+            <Button className="rounded-sm px-4 py-2 text-center bg-gray-500 hover:bg-gray-600 dark:text-white">
+              Share via Email
+            </Button>
+          </EmailShareButton>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <main className="p-2">
       <div className="mx-auto max-w-7xl">
@@ -240,6 +296,27 @@ export default function HomeClient({
                 >
                   Cancel
                 </Button>
+                <div className="mt-0">
+                <select
+                value={selectedPlatform}
+                onChange={(e) => setSelectedPlatform(e.target.value)}
+                className="rounded-sm px-4 py-2 text-center bg-gray-200 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="" disabled>
+                  Select Platform
+                </option>
+                <option value="facebook">Facebook</option>
+                <option value="twitter">Twitter</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="email">Email</option>
+              </select>
+              {selectedPlatform && (
+                <div className="mt-2">
+                  {handleShare()}
+                </div>
+              )}
+            </div>
               </>
             )}
           </div>
