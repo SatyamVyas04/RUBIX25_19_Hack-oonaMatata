@@ -11,12 +11,17 @@ export async function GET() {
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-    // Get all albums where user is mainowner or collaborator
     const albumsResult = await pool.query(
-      `SELECT * FROM albums 
-       WHERE mainowner = $1 
-       OR $1 = ANY(SELECT json_array_elements_text(collab))
-       ORDER BY id DESC`,
+      `
+      SELECT * FROM albums 
+      WHERE mainowner = $1
+      OR EXISTS (
+        SELECT 1
+        FROM json_array_elements(collab) AS c
+        WHERE c->>'userid' = $1 AND (c->>'permission' = 'editor')
+      )
+      ORDER BY id DESC
+      `,
       [session.user.email],
     );
 

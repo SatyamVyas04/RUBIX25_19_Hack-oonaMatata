@@ -24,7 +24,7 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
   const fetchAlbums = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/albums/get");
+      const response = await fetch("/api/albums/getall");
       const data = await response.json();
 
       if (!response.ok) {
@@ -99,19 +99,26 @@ export default function AlbumsClient({ userEmail }: { userEmail: string }) {
                   </div>
                 )}
               </div>
-              <div className="p-4">
-                <h3 className="mb-1 text-lg font-semibold text-foreground">
-                  {album.name}
-                </h3>
-                {album.description && (
-                  <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
-                    {album.description}
+              <div className="flex flex-row items-start justify-between p-4">
+                <div>
+                  <h3 className="mb-1 text-lg font-semibold text-foreground">
+                    {album.name}
+                  </h3>
+                  {album.description && (
+                    <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
+                      {album.description}
+                    </p>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    {album.images.length}{" "}
+                    {album.images.length === 1 ? "photo" : "photos"}
                   </p>
-                )}
-                <p className="text-sm text-muted-foreground">
-                  {album.images.length}{" "}
-                  {album.images.length === 1 ? "photo" : "photos"}
-                </p>
+                </div>
+                <div className="h-fit rounded-full bg-pink-500 px-2 py-1 text-sm font-bold">
+                  <div>
+                    {album.mainowner === userEmail ? "Owner" : "Collaborator"}
+                  </div>
+                </div>
               </div>
             </Link>
           ))}

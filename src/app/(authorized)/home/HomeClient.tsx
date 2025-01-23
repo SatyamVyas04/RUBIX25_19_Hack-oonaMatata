@@ -53,7 +53,7 @@ export default function HomeClient({
 
   const fetchAlbums = async () => {
     try {
-      const response = await fetch("/api/albums/get");
+      const response = await fetch("/api/albums/getedit");
       const data = await response.json();
       if (response.ok) {
         setAlbums(data.albums);
