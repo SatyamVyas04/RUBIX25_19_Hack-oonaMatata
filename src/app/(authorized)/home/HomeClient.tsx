@@ -199,6 +199,12 @@ export default function HomeClient({
                 View Albums
               </Button>
             </Link>
+            <Link
+              href="/timecapsules"
+              className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+            >
+              Time Capsules
+            </Link>
             {!isSelectionMode && (
               <Button
                 onClick={() => setIsSelectionMode(true)}
