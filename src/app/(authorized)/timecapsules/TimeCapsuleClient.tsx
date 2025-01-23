@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { CloudinaryImage } from "@/components/cloudinary-image";
 import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/24/solid";
+import confetti from 'canvas-confetti';
 
 interface Album {
   id: string;
@@ -27,6 +28,17 @@ interface TimeCapsule {
   password?: string;
   images: string[];
 }
+
+const THEMES = [
+  { id: "classic", name: "Classic", bgColor: "bg-zinc-100", textColor: "text-gray-900" },
+  { id: "vintage", name: "Vintage", bgColor: "bg-amber-100", textColor: "text-amber-900" },
+  { id: "modern", name: "Modern", bgColor: "bg-blue-100", textColor: "text-blue-900" },
+  { id: "dark", name: "Dark", bgColor: "bg-zinc-900", textColor: "text-white" },
+  { id: "nature", name: "Nature", bgColor: "bg-green-100", textColor: "text-green-900" },
+  { id: "sunset", name: "Sunset", bgColor: "bg-orange-100", textColor: "text-orange-900" },
+  { id: "ocean", name: "Ocean", bgColor: "bg-cyan-100", textColor: "text-cyan-900" },
+  { id: "royal", name: "Royal", bgColor: "bg-purple-100", textColor: "text-purple-900" },
+];
 
 export default function TimeCapsuleClient({
   userEmail,
@@ -157,18 +169,63 @@ export default function TimeCapsuleClient({
     }
   };
 
-  const canOpenCapsule = (openAt: string) => {
+  const canOpenCapsule = useCallback((openAt: string) => {
     return new Date(openAt) <= new Date();
-  };
+  }, []);
+
+  const triggerConfetti = useCallback(() => {
+    const duration = 5000;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval: any = setInterval(function() {
+      const timeLeft = duration - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+      });
+    }, 250);
+  }, []);
+
+  useEffect(() => {
+    // Check for newly unlocked capsules
+    capsules.forEach(capsule => {
+      const now = new Date();
+      const unlockTime = new Date(capsule.unlock_time);
+      const timeDiff = Math.abs(now.getTime() - unlockTime.getTime());
+      
+      // If a capsule was unlocked within the last minute, trigger confetti
+      if (timeDiff < 60000 && now >= unlockTime) {
+        triggerConfetti();
+      }
+    });
+  }, [capsules, triggerConfetti]);
 
   if (loading) {
     return (
       <main className="container mx-auto px-4 py-2">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Time Capsules</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Time Capsules</h1>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            className="inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+            disabled={loading}
           >
             Create Time Capsule
           </button>
@@ -201,75 +258,93 @@ export default function TimeCapsuleClient({
       )}
 
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Time Capsules</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Your Time Capsules</h1>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          className="inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          disabled={loading}
         >
-          Create Time Capsule
+          Create New Capsule
         </button>
       </div>
 
-      {capsules.length === 0 ? (
-        <div className="py-12 text-center">
-          <p className="text-zinc-500">
-            No time capsules yet. Create your first one!
-          </p>
+      {error ? (
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-500 mb-4">{error}</p>
+          </div>
+        </div>
+      ) : capsules.length === 0 ? (
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-500 mb-4">No time capsules found. Create one to get started!</p>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="inline-flex items-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-500 hover:to-indigo-500"
+            >
+              Create Your First Capsule
+            </button>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {capsules.map((capsule) => (
-            <div
-              key={capsule.id}
-              className="bg-zinc overflow-hidden rounded-lg shadow-md"
-            >
-              <div className="aspect-w-16 aspect-h-9 relative">
-                {capsule.images[0] && (
-                  <div className="relative">
-                    <CloudinaryImage
-                      src={capsule.images[0]}
-                      alt={capsule.album_name}
-                      width={400}
-                      height={300}
-                      className={`h-full w-full object-cover ${
-                        !canOpenCapsule(capsule.unlock_time) ? "blur-lg" : ""
-                      }`}
-                    />
-                    {!canOpenCapsule(capsule.unlock_time) && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <LockClosedIcon className="h-12 w-12 text-white" />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="mb-1 text-lg font-semibold">
-                  {capsule.album_name}
-                </h3>
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    {!canOpenCapsule(capsule.unlock_time) ? (
-                      <>
-                        <LockClosedIcon className="mr-1 inline h-4 w-4" />
-                        Opens {new Date(capsule.unlock_time).toLocaleString()}
-                      </>
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {capsules.map((capsule) => {
+            const isUnlocked = canOpenCapsule(capsule.unlock_time);
+
+            return (
+              <div
+                key={capsule.id}
+                className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-xl"
+              >
+                <Link href={`/capsule/${capsule.id}`}>
+                  <div className="relative aspect-[4/3]">
+                    {capsule.images && capsule.images[0] ? (
+                      <CloudinaryImage
+                        src={capsule.images[0]}
+                        alt={capsule.album_name}
+                        height={300}
+                        width={400}
+                        className={`h-full w-full object-cover transition-all duration-500 ${
+                          !isUnlocked ? 'blur-sm' : ''
+                        } group-hover:scale-105`}
+                      />
                     ) : (
-                      <>
-                        <LockOpenIcon className="mr-1 inline h-4 w-4" />
-                        <Link
-                          href={`/albums/${capsule.albums[0]}`}
-                          className="text-blue-500 hover:text-blue-600"
-                        >
-                          View Album
-                        </Link>
-                      </>
+                      <div className="h-full w-full bg-gradient-to-br from-gray-100 to-gray-200" />
                     )}
-                  </p>
-                </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80" />
+                    
+                    {/* Lock Icon with Background */}
+                    <div className="absolute right-3 top-3 rounded-full bg-white/90 p-2 shadow-lg">
+                      {isUnlocked ? (
+                        <LockOpenIcon className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <LockClosedIcon className="h-5 w-5 text-red-500" />
+                      )}
+                    </div>
+
+                    {/* Content Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <h3 className="mb-1 text-lg font-semibold text-white">
+                        {capsule.album_name}
+                      </h3>
+                      <p className="text-sm text-white/90">
+                        {isUnlocked ? (
+                          <span className="flex items-center gap-1">
+                            <span className="inline-block h-2 w-2 rounded-full bg-green-500"></span>
+                            Unlocked
+                          </span>
+                        ) : (
+                          <span>
+                            Opens {new Date(capsule.unlock_time).toLocaleDateString()}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -364,14 +439,11 @@ export default function TimeCapsuleClient({
                           className="mt-1 block w-full rounded-md border-zinc-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                           required
                         >
-                          <option value="classic">Classic</option>
-                          <option value="vintage">Vintage</option>
-                          <option value="modern">Modern</option>
-                          <option value="dark">Dark</option>
-                          <option value="nature">Nature</option>
-                          <option value="sunset">Sunset</option>
-                          <option value="ocean">Ocean</option>
-                          <option value="royal">Royal</option>
+                          {THEMES.map((theme) => (
+                            <option key={theme.id} value={theme.id}>
+                              {theme.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="space-y-2">
