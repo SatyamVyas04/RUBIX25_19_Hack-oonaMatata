@@ -163,9 +163,20 @@ export default function TimeCapsuleClient({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
-      </div>
+      <main className="container mx-auto px-4 py-2">
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Time Capsules</h1>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          >
+            Create Time Capsule
+          </button>
+        </div>
+        <div className="flex justify-center items-center h-[calc(100vh-200px)]">
+          <div className="h-16 w-16 animate-spin rounded-full border-4 border-transparent border-t-4 border-b-4 border-t-pink-500 border-b-pink-500"></div>
+        </div>
+      </main>
     );
   }
 
@@ -199,18 +210,18 @@ export default function TimeCapsuleClient({
         </button>
       </div>
 
-      {capsules.length === 0 ? (
-        <div className="py-12 text-center">
-          <p className="text-gray-500">
-            No time capsules yet. Create your first one!
+      {albums.length === 0 ? (
+        <div className="flex min-h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-zinc-300">
+          <p className="text-center text-zinc-500">
+            No capsules yet. Create your first one!
           </p>
         </div>
-      ) : (
+      ) :  (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {capsules.map((capsule) => (
             <div
               key={capsule.id}
-              className="overflow-hidden rounded-lg bg-white shadow-md"
+              className="overflow-hidden rounded-lg bg-zinc shadow-md"
             >
               <div className="aspect-w-16 aspect-h-9 relative">
                 {capsule.images[0] && (
