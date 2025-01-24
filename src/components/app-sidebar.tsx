@@ -83,6 +83,12 @@ const data = {
       icon: "notifs",
       items: [],
     },
+    {
+      title: "Template",
+      url: "http://localhost:3001",
+      icon: "gifting",
+      items: [],
+    },
   ],
 };
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
