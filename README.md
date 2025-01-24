@@ -29,8 +29,8 @@
    - Share your memories with loved ones by gifting them capsules.
    - Ownership of the capsule and its album is transferred seamlessly, adding a personal touch.
 
-7. **AI Face Detection** *(Experimental)*
-   - Automatically groups photos of the same person using AI.
+7. **ML-Based Face Detection** *(Experimental)*
+   - Automatically groups photos of the same person using machine learning techniques.
    - Create custom videos or albums for each person based on these groups.
 
 8. **Modern UI/UX**
