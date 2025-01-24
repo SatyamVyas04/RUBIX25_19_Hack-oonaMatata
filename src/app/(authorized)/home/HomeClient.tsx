@@ -31,7 +31,7 @@ export default function HomeClient({ initialImages, userName }: HomeClientProps)
       (image) => new Date(image.date).toDateString() === date.toDateString()
     );
     setFilteredImages(filtered); // Update filtered images
-    console.log("Filtered Images:", filtered);
+    // console.log("Filtered Images:", filtered);
   };
 
   const toggleImageSelection = (imageUrl: string) => {

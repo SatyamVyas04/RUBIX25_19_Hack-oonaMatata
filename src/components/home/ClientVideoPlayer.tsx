@@ -8,7 +8,7 @@ interface ClientVideoPlayerProps {
 }
 
 export default function ClientVideoPlayer({ publicId }: ClientVideoPlayerProps) {
-  console.log(publicId)
+  // console.log(publicId)
   return (
     <div className="aspect-video">
       <CldVideoPlayer

@@ -27,7 +27,7 @@ export default async function HomePage() {
     date: row.date, // Ensure date is included in the images array
   }));
   await pool.end();
-  console.log(images)
+  // console.log(images)
   return (
     <HomeClient initialImages={images} userName={session?.user?.name || ""} />
   );
