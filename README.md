@@ -2,6 +2,8 @@
 
 **The Memory Box** is a modern app designed to help you preserve, relive, and share your cherished moments in style. With features like capsule creation, collaboration, gifting, and even an experimental AI-powered face detection, it’s the perfect way to keep your memories alive.
 
+![HomePage](https://github.com/user-attachments/assets/d8fa274a-b126-4605-b7ad-d25eadbdbb72)
+
 ## Features
 
 1. **Secure Authentication**
@@ -50,8 +52,6 @@ Here’s the tech stack that powers The Memory Box:
 - **Flask**
 - **MoviePy**
 - **NumPy**
-
-![HomePage](https://github.com/user-attachments/assets/d8fa274a-b126-4605-b7ad-d25eadbdbb72)
 
 ## Meet the Team
 
